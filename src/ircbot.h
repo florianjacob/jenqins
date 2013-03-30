@@ -26,7 +26,6 @@ public:
 
 private slots:
     void onConnected();
-    void onMessageReceived(IrcMessage* message);
 
 private:
     QString m_channel;

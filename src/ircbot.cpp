@@ -8,6 +8,9 @@
  */
 
 #include "ircbot.h"
+#include "modules/greetmodule.h"
+#include "modules/echomodule.h"
+#include "modules/messagemodule.h"
 #include <Communi/IrcCommand>
 #include <Communi/IrcMessage>
 
@@ -15,7 +18,17 @@
 IrcBot::IrcBot(QObject* parent) : IrcSession(parent), out(stdout)
 {
     connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
-    connect(this, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+
+	GreetModule* greeter = new GreetModule(this);
+	connect(this, SIGNAL(messageReceived(IrcMessage*)), greeter, SLOT(onMessageReceived(IrcMessage*)));
+
+	MessageModule* messenger = new MessageModule(this);
+	connect(this, SIGNAL(messageReceived(IrcMessage*)), messenger, SLOT(onMessageReceived(IrcMessage*)));
+
+	/*
+	EchoModule* echoer = new EchoModule(this);
+	connect(this, SIGNAL(messageReceived(IrcMessage*)), echoer, SLOT(onMessageReceived(IrcMessage*)));
+	*/
 }
 
 
@@ -34,22 +47,7 @@ void IrcBot::onConnected()
 {
     sendCommand(IrcCommand::createJoin(m_channel));
     out << "Verbunden. Betrete " << m_channel << "." << endl;
-}
 
-void IrcBot::onMessageReceived(IrcMessage* message)
-{
-    if (message->type() == IrcMessage::Private) {
-        IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-
-        if (!msg->target().compare(nickName(), Qt::CaseInsensitive)) {
-            // echo private message
-            sendCommand(IrcCommand::createMessage(msg->sender().name(), msg->message()));
-        } else if (msg->message().startsWith(nickName(), Qt::CaseInsensitive)) {
-            // echo prefixed channel message
-            QString reply = msg->message().mid(msg->message().indexOf(" "));
-            sendCommand(IrcCommand::createMessage(m_channel, msg->sender().name() + ":" + reply));
-        }
-    }
 }
 
 #include "ircbot.moc"
