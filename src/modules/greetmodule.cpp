@@ -31,25 +31,31 @@ GreetModule::~GreetModule()
 }
 
 void GreetModule::onMessageReceived(IrcMessage* message) {
-	if (message->type() == IrcMessage::Join) {
-		IrcJoinMessage* msg = static_cast<IrcJoinMessage*>(message);
-		QString name = msg->sender().name();
-		QString greet = QString("Hi %1! Welcome in %2.").arg(name).arg(msg->channel());
-		bot->sendCommand(IrcCommand::createMessage(msg->channel(), greet));
-		out << "Greeted " << name << "." << endl;
-	} else if (message->type() == IrcMessage::Part) {
-		IrcPartMessage* msg = static_cast<IrcPartMessage*>(message);
-		QString name = msg->sender().name();
-		QString bye = QString(" is shocked that %1 left %2 in favour of another channel.")
-		.arg(name).arg(msg->channel());
-		bot->sendCommand(IrcCommand::createCtcpAction(msg->channel(), bye));
-		out << "Said good-bye to " << name << "." << endl;
-	} else if (message->type() == IrcMessage::Quit) {
-		IrcQuitMessage* msg = static_cast<IrcQuitMessage*>(message);
-		QString name = msg->sender().name();
-		QString bye = QString(" is a little sad that %1 left.").arg(name);
-		bot->sendCommand(IrcCommand::createCtcpAction(bot->channel(), bye));
-		out << "Said good-bye to " << name << "." << endl;
+	switch (message->type()) {
+		case IrcMessage::Join:
+			IrcJoinMessage* msg = static_cast<IrcJoinMessage*>(message);
+			QString name = msg->sender().name();
+			QString greet = QString("Hi %1! Welcome in %2.").arg(name).arg(msg->channel());
+			bot->sendCommand(IrcCommand::createMessage(msg->channel(), greet));
+			out << "Greeted " << name << "." << endl;
+			break;
+
+		case IrcMessage::Part:
+			IrcPartMessage* msg = static_cast<IrcPartMessage*>(message);
+			QString name = msg->sender().name();
+			QString bye = QString(" is shocked that %1 left %2 in favour of another channel.")
+			.arg(name).arg(msg->channel());
+			bot->sendCommand(IrcCommand::createCtcpAction(msg->channel(), bye));
+			out << "Said good-bye to " << name << "." << endl;
+			break;
+
+		case IrcMessage::Quit:
+			IrcQuitMessage* msg = static_cast<IrcQuitMessage*>(message);
+			QString name = msg->sender().name();
+			QString bye = QString(" is a little sad that %1 left.").arg(name);
+			bot->sendCommand(IrcCommand::createCtcpAction(bot->channel(), bye));
+			out << "Said good-bye to " << name << "." << endl;
+			break;
 	}
 }
 

@@ -21,9 +21,9 @@ int main(int argc, char* argv[])
     QSettings settings("settings.ini", QSettings::IniFormat);
     bot.setHost(settings.value("host", "irc.freenode.net").toString());
     bot.setPort(settings.value("port", 6667).toInt());
-    bot.setUserName(settings.value("username", "CommuniBot").toString());
     bot.setNickName(settings.value("nickname", "CommuniBot").toString());
-    bot.setRealName(settings.value("realname", "CommuniBot").toString());
+    bot.setUserName(settings.value("username", bot.nickName()).toString());
+    bot.setRealName(settings.value("realname", bot.userName()).toString());
     bot.setChannel(settings.value("channel", "#ceylon").toString());
 
     bot.open();
