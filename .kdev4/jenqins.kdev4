@@ -1,5 +1,5 @@
 [Buildset]
-BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x14\x00C\x00o\x00m\x00m\x00u\x00n\x00i\x00B\x00o\x00t)
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
 
 [CMake]
 Build Directory Count=1
@@ -8,8 +8,8 @@ Current Build Directory Index=0
 ProjectRootRelative=./
 
 [CMake][CMake Build Directory 0]
-Build Directory Path=file:///home/raignarok/Programming/Qt/CommuniBot/build
-Build Type=Debug
+Build Directory Path=file:///home/raignarok/Programming/Qt/jenqins/build
+Build Type=
 CMake Binary=file:///usr/bin/cmake
 Environment Profile=
 Extra Arguments=
@@ -21,7 +21,7 @@ Launch Configurations=Launch Configuration 0
 [Launch][Launch Configuration 0]
 Configured Launch Modes=execute
 Configured Launchers=nativeAppLauncher
-Name=CommuniBot
+Name=jenqins
 Type=Native Application
 
 [Launch][Launch Configuration 0][Data]
@@ -31,7 +31,7 @@ Dependency Action=Build
 EnvironmentGroup=default
 Executable=
 External Terminal=konsole --noclose --workdir %workdir -e %exe
-Project Target=CommuniBot,CommuniBot
+Project Target=jenqins,jenqins
 Use External Terminal=false
 Working Directory=
 isExecutable=false
