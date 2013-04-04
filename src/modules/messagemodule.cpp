@@ -39,6 +39,7 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 		// is the message not a direct message => a message from a channel?
 		if (msg->target().compare(bot->nickName(), Qt::CaseInsensitive) != 0) {
 			if (messages.contains(msg->sender().name())) {
+				out << "replaying messages for " << msg->sender().name() << ".." << endl;
 				foreach (QString message, messages.values(msg->sender().name()))
 				{
 					bot->sendCommand(IrcCommand::createMessage(msg->target(), message));
@@ -48,32 +49,37 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 
 			if (msg->message().startsWith(bot->nickName(), Qt::CaseInsensitive)) {
 				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
-				parts.removeFirst();
+				if (parts.size() >= 4) {
+					parts.removeFirst();
 
-				if (parts.first() == "memo") {
-					parts.removeFirst();
-					QString receiver = parts.first();
-					parts.removeFirst();
-					if (receiver == bot->nickName()) {
-						bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																   QString("You can't leave memos for me..")));
-					} else if (receiver == msg->sender().name()) {
-						bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																   QString("You can't leave memos for yourself.")));
-					} else {
-						messages.insertMulti(receiver,
-							QString("%1: [%2] <%3/%4> %5")
+					if (parts.first() == "memo") {
+						parts.removeFirst();
+						QString receiver = parts.first();
+						parts.removeFirst();
+						if (receiver == bot->nickName()) {
+							bot->sendCommand(IrcCommand::createMessage(msg->target(),
+																	   QString("You can't leave memos for me..")));
+						} else if (receiver == msg->sender().name()) {
+							bot->sendCommand(IrcCommand::createMessage(msg->target(),
+																	   QString("You can't leave memos for yourself.")));
+						} else {
+							messages.insertMulti(receiver,
+												 QString("%1: [%2] <%3/%4> %5")
 							.arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
 							.arg(msg->target()).arg(msg->sender().name()).arg(parts.join(" ")));
-						bot->sendCommand(IrcCommand::createMessage(msg->target(),
-									QString("%1: Memo for %2 recorded.").arg(msg->sender().name()).arg(receiver)));
+							bot->sendCommand(IrcCommand::createMessage(msg->target(),
+																	   QString("%1: Memo for %2 recorded.").arg(msg->sender().name()).arg(receiver)));
+						}
 					}
 				}
 			}
 		}
 
 	} else if (message->type() == IrcMessage::Join || message->type() == IrcMessage::Nick) {
-		bot->sendCommand(IrcCommand::createMessage(message->sender().name(), QString("You have memos. Speak publicly in a channel to retreive them.")));
+		if (messages.contains(message->sender().name())) {
+			out << "Notifying " << message->sender().name() << " about his messages." << endl;
+			bot->sendCommand(IrcCommand::createMessage(message->sender().name(), QString("You have memos. Speak publicly in a channel to retreive them.")));
+		}
 	}
 }
 
