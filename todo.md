@@ -1,0 +1,1 @@
+	* Fürs Messagemodul: Prüfen, ob derjenige gerade online ist (nicklist)

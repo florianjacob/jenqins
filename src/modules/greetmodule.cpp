@@ -34,9 +34,15 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 	if (message->type() == IrcMessage::Join) {
 			IrcJoinMessage* msg = static_cast<IrcJoinMessage*>(message);
 			QString name = msg->sender().name();
-			QString greet = QString("Hi %1! Welcome in %2.").arg(name).arg(msg->channel());
-			bot->sendCommand(IrcCommand::createMessage(msg->channel(), greet));
-			out << "Greeted " << name << "." << endl;
+			if (name != bot->nickName()) {
+				QString greet = QString("Hi %1! Welcome in %2.").arg(name).arg(msg->channel());
+				bot->sendCommand(IrcCommand::createMessage(msg->channel(), greet));
+				out << "Greeted " << name << "." << endl;
+			} else {
+				QString enter = QString("enters %1 and fades to the background, immediatly available when somebody needs his services.").arg(msg->channel());
+				bot->sendCommand(IrcCommand::createCtcpAction(msg->channel(), enter));
+				out << "Joined " << msg->channel() << "." << endl;
+			}
 	} else if (message->type() == IrcMessage::Part) {
 			IrcPartMessage* msg = static_cast<IrcPartMessage*>(message);
 			QString name = msg->sender().name();
