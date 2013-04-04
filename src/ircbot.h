@@ -17,6 +17,7 @@ class IrcBot : public IrcSession
 {
     Q_OBJECT
     Q_PROPERTY(QString channel READ channel WRITE setChannel)
+    Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
 
 public:
     IrcBot(QObject* parent = 0);
@@ -24,11 +25,15 @@ public:
     QString channel() const;
     void setChannel(const QString& channel);
 
+	QString nickservPassword() const;
+	void setNickservPassword(const QString& password);
+
 private slots:
     void onConnected();
 
 private:
     QString m_channel;
+    QString m_nickservPassword;
     QTextStream out;
 };
 

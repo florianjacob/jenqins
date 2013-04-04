@@ -31,20 +31,33 @@ IrcBot::IrcBot(QObject* parent) : IrcSession(parent), out(stdout)
 	*/
 }
 
-
 QString IrcBot::channel() const
 {
-    return m_channel;
+	return m_channel;
 }
 
 void IrcBot::setChannel(const QString& channel)
 {
-    m_channel = channel;
+	m_channel = channel;
 
 }
 
+QString IrcBot::nickservPassword() const
+{
+	return m_nickservPassword;
+}
+
+void IrcBot::setNickservPassword(const QString& password)
+{
+	m_nickservPassword = password;
+}
+
+
 void IrcBot::onConnected()
 {
+	if (!m_nickservPassword.isEmpty()) {
+		sendCommand(IrcCommand::createMessage(QString("nickserv"), QString("identify ") + m_nickservPassword));
+	}
     sendCommand(IrcCommand::createJoin(m_channel));
     out << "Verbunden. Betrete " << m_channel << "." << endl;
 
