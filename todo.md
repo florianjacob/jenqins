@@ -3,3 +3,5 @@
 	* logging erweitern
 	* Fürs Messagemodul: Away-Status überwachen?
 	* nickname_ und nickname1 auch als nickname erkennen
+	* als Default einen Random Nicknamen nehmen
+	* SSL verbindung

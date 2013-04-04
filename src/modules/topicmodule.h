@@ -17,31 +17,18 @@
 */
 
 
-#include "echomodule.h"
+#ifndef TOPICMODULE_H
+#define TOPICMODULE_H
+#include "botmodule.h"
 
-EchoModule::EchoModule(IrcBot* bot) : BotModule(bot)
+class TopicModule : public BotModule
 {
+public:
+	TopicModule(IrcBot* bot);
+	virtual ~TopicModule();
 
-}
+public slots:
+	virtual void onMessageReceived(IrcMessage* message);
+};
 
-EchoModule::~EchoModule()
-{
-
-}
-
-void EchoModule::onMessageReceived(IrcMessage* message)
-{
-	if (message->type() == IrcMessage::Private) {
-		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-
-		if (!msg->target().compare(bot->nickName(), Qt::CaseInsensitive)) {
-			// echo private message
-			bot->sendCommand(IrcCommand::createMessage(msg->sender().name(), msg->message()));
-		} else if (msg->message().startsWith(bot->nickName(), Qt::CaseInsensitive)) {
-			// echo prefixed channel message
-			QString reply = msg->message().mid(msg->message().indexOf(" "));
-			bot->sendCommand(IrcCommand::createMessage(msg->target(), msg->sender().name() + ":" + reply));
-		}
-	}
-
-}
+#endif // TOPICMODULE_H

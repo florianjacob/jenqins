@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     bot.setNickName(settings.value("nickname", "jenqins").toString());
     bot.setUserName(settings.value("username", bot.nickName()).toString());
     bot.setRealName(settings.value("realname", bot.userName()).toString());
-    bot.setNickservPassword(settings.value("nickservpassword", QString("")));
+    bot.setNickservPassword(settings.value("nickservpassword", "").toString());
     bot.setChannel(settings.value("channel", "#ceylon").toString());
 
     bot.open();
