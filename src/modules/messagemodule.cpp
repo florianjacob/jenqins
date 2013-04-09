@@ -19,15 +19,28 @@
 
 #include "messagemodule.h"
 #include <QTime>
+#include <QFile>
+#include <QDataStream>
+#include <Irc>
 
 MessageModule::MessageModule(IrcBot* bot): BotModule(bot)
 {
-
+	QFile file("messages.dat");
+	if (file.exists()) {
+		file.open(QIODevice::ReadOnly);
+		QDataStream dataIn(&file);    // read the data serialized from the file
+		dataIn >> messages;
+		out << "messages loaded." << endl;
+	}
 }
 
 MessageModule::~MessageModule()
 {
-
+	QFile file("messages.dat");
+	file.open(QIODevice::WriteOnly);
+	QDataStream dataOut(&file);   // we will serialize the data into the file
+	dataOut << messages;
+	out << "messages saved." << endl;
 }
 
 
@@ -65,20 +78,46 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 						} else {
 							messages.insertMulti(receiver,
 												 QString("%1: [%2] <%3/%4> %5")
-							.arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
+												 .arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
 							.arg(msg->target()).arg(msg->sender().name()).arg(parts.join(" ")));
 							bot->sendCommand(IrcCommand::createMessage(msg->target(),
 																	   QString("%1: Memo for %2 recorded.").arg(msg->sender().name()).arg(receiver)));
+							bot->sendCommand(IrcCommand::createNames(bot->channel()));
 						}
 					}
 				}
 			}
 		}
 
-	} else if (message->type() == IrcMessage::Join || message->type() == IrcMessage::Nick) {
-		if (messages.contains(message->sender().name())) {
-			out << "Notifying " << message->sender().name() << " about his messages." << endl;
-			bot->sendCommand(IrcCommand::createMessage(message->sender().name(), QString("You have memos. Speak publicly in a channel to retreive them.")));
+	} else if (message->type() == IrcMessage::Join) {
+		// we get join messages from all users in the channel at startup, so this gets also called
+		// for every user in the channel we joined
+		notifyAboutMemos(message->sender().name());
+	} else if (message->type() == IrcMessage::Nick) {
+		IrcNickMessage* msg = static_cast<IrcNickMessage*>(message);
+		notifyAboutMemos(msg->nick());
+	} else if (message->type() == IrcMessage::Numeric) {
+		IrcNumericMessage* msg = static_cast<IrcNumericMessage*>(message);
+		if (msg->code() == Irc::RPL_NAMREPLY) {
+			QStringList nicks = msg->parameters().last().split(" ", QString::SkipEmptyParts);
+			foreach (QString nick, nicks)
+			{
+				notifyAboutMemos(nick);
+			}
+		}
+	}
+}
+
+void MessageModule::notifyAboutMemos(const QString& nick)
+{
+	if (messages.contains(nick)) {
+		out << "Notifying " << nick << " about his messages." << endl;
+		bot->sendCommand(IrcCommand::createMessage(nick, QString("You have memos. Speak publicly in a channel to retreive them.")));
+	} else {
+		QString shortenedNick(nick.left(nick.size() - 1));
+		if (messages.contains(shortenedNick)) {
+			out << "Notifying " << nick << " about messages for " << shortenedNick << "." << endl;
+			bot->sendCommand(IrcCommand::createMessage(nick, QString("%1 has memos. Is that you? Change your nick back and speak publicly in a channel to retreive them.").arg(shortenedNick)));
 		}
 	}
 }

@@ -11,9 +11,25 @@
 #include <QSettings>
 #include <QTextStream>
 #include "ircbot.h"
+#include <iostream>
+
+#include <csignal>
+
+struct CleanExit{
+	CleanExit() {
+		signal(SIGINT, &CleanExit::exitQt);
+		signal(SIGTERM, &CleanExit::exitQt);
+	}
+
+	static void exitQt(int sig) {
+		std::cout << "exiting.." << std::endl;
+		QCoreApplication::exit(0);
+	}
+};
 
 int main(int argc, char* argv[])
 {
+	CleanExit cleanExit;
     QCoreApplication app(argc, argv);
     IrcBot bot;
     QTextStream qout(stdout);
