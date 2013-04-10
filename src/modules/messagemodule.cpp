@@ -85,7 +85,7 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 							.arg(msg->target()).arg(msg->sender().name()).arg(parts.join(" ")));
 							bot->sendCommand(IrcCommand::createMessage(msg->target(),
 																	   QString("%1: Memo for %2 recorded.").arg(msg->sender().name()).arg(receiver)));
-							bot->sendCommand(IrcCommand::createNames(bot->channel()));
+							bot->sendCommand(IrcCommand::createNames(bot->channels()));
 						}
 					}
 				}
@@ -102,25 +102,26 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 	} else if (message->type() == IrcMessage::Numeric) {
 		IrcNumericMessage* msg = static_cast<IrcNumericMessage*>(message);
 		if (msg->code() == Irc::RPL_NAMREPLY) {
+			QString channel = msg->parameters().value(2);
 			QStringList nicks = msg->parameters().last().split(" ", QString::SkipEmptyParts);
 			foreach (QString nick, nicks)
 			{
-				notifyAboutMemos(nick);
+				notifyAboutMemos(nick, channel);
 			}
 		}
 	}
 }
 
-void MessageModule::notifyAboutMemos(const QString& nick)
+void MessageModule::notifyAboutMemos(const QString& nick, const QString& channel)
 {
 	if (messages.contains(nick)) {
 		out << "Notifying " << nick << " about his messages." << endl;
-		bot->sendCommand(IrcCommand::createMessage(nick, QString("You have memos. Speak publicly in a channel to retreive them.")));
+		bot->sendCommand(IrcCommand::createMessage(nick, QString("You have memos. Speak publicly in %1 to retreive them.").arg(channel)));
 	} else {
 		QString shortenedNick(nick.left(nick.size() - 1));
 		if (messages.contains(shortenedNick)) {
 			out << "Notifying " << nick << " about messages for " << shortenedNick << "." << endl;
-			bot->sendCommand(IrcCommand::createMessage(nick, QString("%1 has memos. Is that you? Change your nick back and speak publicly in a channel to retreive them.").arg(shortenedNick)));
+			bot->sendCommand(IrcCommand::createMessage(nick, QString("%1 has memos. Is that you? Change your nick back and speak publicly in %2 to retreive them.").arg(shortenedNick).arg(channel)));
 		}
 	}
 }

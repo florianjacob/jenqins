@@ -33,7 +33,7 @@ public slots:
 	virtual void onMessageReceived(IrcMessage* message);
 
 private:
-	void notifyAboutMemos(const QString& nick);
+	void notifyAboutMemos(const QString& nick, const QString& channel = "a channel");
 	QHash<QString, QString> messages;
 };
 

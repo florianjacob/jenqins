@@ -12,18 +12,19 @@
 
 #include <Communi/IrcSession>
 #include <QTextStream>
+#include <QStringList>
 
 class IrcBot : public IrcSession
 {
     Q_OBJECT
-    Q_PROPERTY(QString channel READ channel WRITE setChannel)
+    Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
     Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
 
 public:
     IrcBot(QObject* parent = 0);
 
-    QString channel() const;
-    void setChannel(const QString& channel);
+    QStringList channels() const;
+    void setChannels(const QStringList& channel);
 
 	QString nickservPassword() const;
 	void setNickservPassword(const QString& password);
@@ -33,7 +34,7 @@ private slots:
 	void onMessageReceived(IrcMessage* message);
 
 private:
-    QString m_channel;
+    QStringList m_channels;
     QString m_nickservPassword;
     QTextStream out;
 };

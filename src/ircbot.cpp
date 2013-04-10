@@ -39,14 +39,14 @@ IrcBot::IrcBot(QObject* parent) : IrcSession(parent), out(stdout)
 	*/
 }
 
-QString IrcBot::channel() const
+QStringList IrcBot::channels() const
 {
-	return m_channel;
+	return m_channels;
 }
 
-void IrcBot::setChannel(const QString& channel)
+void IrcBot::setChannels(const QStringList& channels)
 {
-	m_channel = channel;
+	m_channels = channels;
 
 }
 
@@ -63,12 +63,16 @@ void IrcBot::setNickservPassword(const QString& password)
 
 void IrcBot::onConnected()
 {
+	out << "Verbunden." << endl;
 	if (!m_nickservPassword.isEmpty()) {
 		sendCommand(IrcCommand::createMessage(QString("NickServ"), QString("identify ") + m_nickservPassword));
 		out << "tried to auth with nickserv." << endl;
 	} else {
-		sendCommand(IrcCommand::createJoin(m_channel));
-		out << "Verbunden. Betrete " << m_channel << "." << endl;
+		foreach (QString channel, m_channels)
+		{
+			sendCommand(IrcCommand::createJoin(channel));
+			out << "Betrete " << channel << "." << endl;
+		}
 	}
 
 }
@@ -79,8 +83,11 @@ void IrcBot::onMessageReceived(IrcMessage* message)
 		IrcNoticeMessage* msg = static_cast<IrcNoticeMessage*>(message);
 		out << "[Notice] " << msg->message() << endl;
 		if (msg->message().startsWith("You are now identified for ")) {
-			sendCommand(IrcCommand::createJoin(m_channel));
-			out << "Authentifiziert. Betrete " << m_channel << "." << endl;
+			foreach (QString channel, m_channels)
+			{
+				sendCommand(IrcCommand::createJoin(channel));
+				out << "Betrete " << channel << "." << endl;
+			}
 		}
 	} else if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);

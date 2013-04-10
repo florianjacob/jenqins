@@ -41,7 +41,9 @@ int main(int argc, char* argv[])
     bot.setUserName(settings.value("username", bot.nickName()).toString());
     bot.setRealName(settings.value("realname", bot.userName()).toString());
     bot.setNickservPassword(settings.value("nickservpassword", "").toString());
-    bot.setChannel(settings.value("channel", "#ceylon").toString());
+	QString concatenatedChannels = settings.value("channels", "#ceylon").toString();
+	QStringList channels = concatenatedChannels.split(" ", QString::SkipEmptyParts);
+    bot.setChannels(channels);
 
     bot.open();
     qout << "Verbinde als: " << bot.nickName() << "@" << bot.host() << ":" << bot.port() << "..." << endl;

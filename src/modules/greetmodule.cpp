@@ -50,12 +50,14 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 			.arg(name).arg(msg->channel());
 			bot->sendCommand(IrcCommand::createCtcpAction(msg->channel(), bye));
 			out << "Said good-bye to " << name << "." << endl;
+			/*
 	} else if (message->type() == IrcMessage::Quit) {
 			IrcQuitMessage* msg = static_cast<IrcQuitMessage*>(message);
 			QString name = msg->sender().name();
 			QString bye = QString(" is a little sad that %1 left.").arg(name);
 			bot->sendCommand(IrcCommand::createCtcpAction(bot->channel(), bye));
 			out << "Said good-bye to " << name << "." << endl;
+			*/
 	}
 }
 
