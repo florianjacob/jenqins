@@ -71,10 +71,13 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 						parts.removeFirst();
 						if (receiver == bot->nickName()) {
 							bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																	   QString("You can't leave memos for me..")));
+																	   msg->sender().name() + QString(": You can't leave memos for me..")));
 						} else if (receiver == msg->sender().name()) {
 							bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																	   QString("You can't leave memos for yourself.")));
+																	   msg->sender().name() + QString(": You can't leave memos for yourself.")));
+						} else if (receiver.contains(":")) {
+							bot->sendCommand(IrcCommand::createMessage(msg->target(),
+																	   msg->sender().name() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?")));
 						} else {
 							messages.insertMulti(receiver,
 												 QString("%1: [%2] <%3/%4> %5")
