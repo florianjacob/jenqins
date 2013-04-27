@@ -19,8 +19,9 @@
 
 #include "topicmodule.h"
 
-TopicModule::TopicModule(IrcBot* bot) : BotModule(bot)
+TopicModule::TopicModule(BotSession* session) : BotModule(session)
 {
+	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 
 }
 
@@ -34,9 +35,9 @@ void TopicModule::onMessageReceived(IrcMessage* message)
 	if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
 
-		if (msg->target().compare(bot->nickName(), Qt::CaseInsensitive) != 0) {
+		if (msg->target().compare(session->nickName(), Qt::CaseInsensitive) != 0) {
 			// message is from channel
-			if (msg->message().startsWith(bot->nickName(), Qt::CaseInsensitive)) {
+			if (msg->message().startsWith(session->nickName(), Qt::CaseInsensitive)) {
 				// message is for bot
 				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
 				if (parts.size() >= 3) {
@@ -45,7 +46,7 @@ void TopicModule::onMessageReceived(IrcMessage* message)
 					if (parts.first() == "topic") {
 						parts.removeFirst();
 						out << "Setting topic for " << msg->target() << " to " << parts.join(" ") << endl;
-						bot->sendCommand(IrcCommand::createTopic(msg->target(), parts.join(" ")));
+						session->sendCommand(IrcCommand::createTopic(msg->target(), parts.join(" ")));
 					}
 				}
 			}

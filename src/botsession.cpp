@@ -7,7 +7,7 @@
  * completely or partially.
  */
 
-#include "ircbot.h"
+#include "botsession.h"
 #include "modules/greetmodule.h"
 #include "modules/echomodule.h"
 #include "modules/messagemodule.h"
@@ -16,52 +16,42 @@
 #include <Communi/IrcMessage>
 
 
-IrcBot::IrcBot(QObject* parent) : IrcSession(parent), out(stdout)
+BotSession::BotSession(QObject* parent) : IrcSession(parent), out(stdout)
 {
     connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
 
-	/*
-	GreetModule* greeter = new GreetModule(this);
-	connect(this, SIGNAL(messageReceived(IrcMessage*)), greeter, SLOT(onMessageReceived(IrcMessage*)));
-	*/
-
 	connect(this, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 
-	MessageModule* messenger = new MessageModule(this);
-	connect(this, SIGNAL(messageReceived(IrcMessage*)), messenger, SLOT(onMessageReceived(IrcMessage*)));
-
-	TopicModule* topic = new TopicModule(this);
-	connect(this, SIGNAL(messageReceived(IrcMessage*)), topic, SLOT(onMessageReceived(IrcMessage*)));
-
-	/*
-	EchoModule* echoer = new EchoModule(this);
-	connect(this, SIGNAL(messageReceived(IrcMessage*)), echoer, SLOT(onMessageReceived(IrcMessage*)));
-	*/
 }
 
-QStringList IrcBot::channels() const
+void BotSession::loadModule(const QString& module) {
+	BotModule* m = BotModule::createAndRegisterModule(module, this);
+	modules.append(m);
+}
+
+QStringList BotSession::channels() const
 {
 	return m_channels;
 }
 
-void IrcBot::setChannels(const QStringList& channels)
+void BotSession::setChannels(const QStringList& channels)
 {
 	m_channels = channels;
 
 }
 
-QString IrcBot::nickservPassword() const
+QString BotSession::nickservPassword() const
 {
 	return m_nickservPassword;
 }
 
-void IrcBot::setNickservPassword(const QString& password)
+void BotSession::setNickservPassword(const QString& password)
 {
 	m_nickservPassword = password;
 }
 
 
-void IrcBot::onConnected()
+void BotSession::onConnected()
 {
 	out << "Verbunden." << endl;
 	if (!m_nickservPassword.isEmpty()) {
@@ -77,9 +67,12 @@ void IrcBot::onConnected()
 
 }
 
-void IrcBot::onMessageReceived(IrcMessage* message)
+void BotSession::onMessageReceived(IrcMessage* message)
 {
-	if (message->type() == IrcMessage::Notice) {
+	if (message->type() == IrcMessage::Private) {
+		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
+		out << "[PM] <" << msg->sender().name() << " > " << msg->message() << endl;
+	} else if (message->type() == IrcMessage::Notice) {
 		IrcNoticeMessage* msg = static_cast<IrcNoticeMessage*>(message);
 		out << "[Notice] " << msg->message() << endl;
 		if (msg->message().startsWith("You are now identified for ")) {
@@ -89,15 +82,22 @@ void IrcBot::onMessageReceived(IrcMessage* message)
 				out << "Betrete " << channel << "." << endl;
 			}
 		}
-	} else if (message->type() == IrcMessage::Private) {
-		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-		out << "[PM] <" << msg->sender().name() << " > " << msg->message() << endl;
 	} else if (message->type() == IrcMessage::Error) {
 		IrcErrorMessage* msg = static_cast<IrcErrorMessage*>(message);
 		out << "[Error] " << msg->error() << endl;
-
 	}
 }
 
+void BotSession::sendMessage(const QString& target, const QString& message)
+{
+	sendCommand(IrcCommand::createMessage(target, message));
+}
 
-#include "ircbot.moc"
+
+void BotSession::sendAction(const QString& target, const QString& message)
+{
+	sendCommand(IrcCommand::createCtcpAction(target, message));
+}
+
+
+#include "botsession.moc"

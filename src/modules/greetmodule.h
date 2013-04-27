@@ -27,7 +27,7 @@ class GreetModule : public BotModule
 	Q_OBJECT
 
 public:
-    GreetModule(IrcBot* bot);
+    GreetModule(BotSession* session);
     virtual ~GreetModule();
 
 public slots:

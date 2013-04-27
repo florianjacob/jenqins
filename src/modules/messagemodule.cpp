@@ -23,7 +23,7 @@
 #include <QDataStream>
 #include <Irc>
 
-MessageModule::MessageModule(IrcBot* bot): BotModule(bot)
+MessageModule::MessageModule(BotSession* session): BotModule(session)
 {
 	QFile file("messages.dat");
 	if (file.exists()) {
@@ -32,6 +32,7 @@ MessageModule::MessageModule(IrcBot* bot): BotModule(bot)
 		dataIn >> messages;
 		out << "messages loaded." << endl;
 	}
+	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 }
 
 MessageModule::~MessageModule()
@@ -50,17 +51,17 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
 
 		// is the message not a direct message => a message from a channel?
-		if (msg->target().compare(bot->nickName(), Qt::CaseInsensitive) != 0) {
+		if (msg->target().compare(session->nickName(), Qt::CaseInsensitive) != 0) {
 			if (messages.contains(msg->sender().name())) {
 				out << "replaying messages for " << msg->sender().name() << ".." << endl;
 				foreach (QString message, messages.values(msg->sender().name()))
 				{
-					bot->sendCommand(IrcCommand::createMessage(msg->target(), message));
+					session->sendMessage(msg->target(), message);
 				}
 				messages.remove(msg->sender().name());
 			}
 
-			if (msg->message().startsWith(bot->nickName(), Qt::CaseInsensitive)) {
+			if (msg->message().startsWith(session->nickName(), Qt::CaseInsensitive)) {
 				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
 				if (parts.size() >= 4) {
 					parts.removeFirst();
@@ -69,23 +70,21 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 						parts.removeFirst();
 						QString receiver = parts.first();
 						parts.removeFirst();
-						if (receiver == bot->nickName()) {
-							bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																	   msg->sender().name() + QString(": You can't leave memos for me..")));
+						if (receiver == session->nickName()) {
+							session->sendMessage(msg->target(),
+											msg->sender().name() + QString(": You can't leave memos for me.."));
 						} else if (receiver == msg->sender().name()) {
-							bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																	   msg->sender().name() + QString(": You can't leave memos for yourself.")));
+							session->sendMessage(msg->target(),
+											msg->sender().name() + QString(": You can't leave memos for yourself."));
 						} else if (receiver.contains(":")) {
-							bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																	   msg->sender().name() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?")));
+							session->sendMessage(msg->target(), msg->sender().name() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?"));
 						} else {
 							messages.insertMulti(receiver,
 												 QString("%1: [%2] <%3/%4> %5")
 												 .arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
 							.arg(msg->target()).arg(msg->sender().name()).arg(parts.join(" ")));
-							bot->sendCommand(IrcCommand::createMessage(msg->target(),
-																	   QString("%1: Memo for %2 recorded.").arg(msg->sender().name()).arg(receiver)));
-							bot->sendCommand(IrcCommand::createNames(bot->channels()));
+							session->sendMessage(msg->target(), QString("%1: Memo for %2 recorded.").arg(msg->sender().name()).arg(receiver));
+							session->sendCommand(IrcCommand::createNames(session->channels()));
 						}
 					}
 				}
@@ -116,12 +115,12 @@ void MessageModule::notifyAboutMemos(const QString& nick, const QString& channel
 {
 	if (messages.contains(nick)) {
 		out << "Notifying " << nick << " about his messages." << endl;
-		bot->sendCommand(IrcCommand::createMessage(nick, QString("You have memos. Speak publicly in %1 to retreive them.").arg(channel)));
+		session->sendMessage(nick, QString("You have memos. Speak publicly in %1 to retreive them.").arg(channel));
 	} else {
 		QString shortenedNick(nick.left(nick.size() - 1));
 		if (messages.contains(shortenedNick)) {
 			out << "Notifying " << nick << " about messages for " << shortenedNick << "." << endl;
-			bot->sendCommand(IrcCommand::createMessage(nick, QString("%1 has memos. Is that you? Change your nick back and speak publicly in %2 to retreive them.").arg(shortenedNick).arg(channel)));
+			session->sendMessage(nick, QString("%1 has memos. Is that you? Change your nick back and speak publicly in %2 to retreive them.").arg(shortenedNick).arg(channel));
 		}
 	}
 }

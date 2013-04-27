@@ -26,7 +26,7 @@ class MessageModule : public BotModule
 {
 	Q_OBJECT
 public:
-	MessageModule(IrcBot* bot);
+	MessageModule(BotSession* session);
 	virtual ~MessageModule();
 
 public slots:

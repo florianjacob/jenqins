@@ -10,7 +10,7 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include <QTextStream>
-#include "ircbot.h"
+#include "botsession.h"
 #include <iostream>
 
 #include <csignal>
@@ -31,21 +31,26 @@ int main(int argc, char* argv[])
 {
 	CleanExit cleanExit;
     QCoreApplication app(argc, argv);
-    IrcBot bot;
+	BotSession session;
     QTextStream qout(stdout);
 
     QSettings settings("settings.ini", QSettings::IniFormat);
-    bot.setHost(settings.value("host", "irc.freenode.net").toString());
-    bot.setPort(settings.value("port", 6667).toInt());
-    bot.setNickName(settings.value("nickname", "jenqins").toString());
-    bot.setUserName(settings.value("username", bot.nickName()).toString());
-    bot.setRealName(settings.value("realname", bot.userName()).toString());
-    bot.setNickservPassword(settings.value("nickservpassword", "").toString());
+    session.setHost(settings.value("host", "irc.freenode.net").toString());
+    session.setPort(settings.value("port", 6667).toInt());
+    session.setNickName(settings.value("nickname", "jenqins").toString());
+    session.setUserName(settings.value("username", session.nickName()).toString());
+    session.setRealName(settings.value("realname", session.userName()).toString());
+    session.setNickservPassword(settings.value("nickservpassword", "").toString());
 	QString concatenatedChannels = settings.value("channels", "#ceylon").toString();
 	QStringList channels = concatenatedChannels.split(" ", QString::SkipEmptyParts);
-    bot.setChannels(channels);
+    session.setChannels(channels);
 
-    bot.open();
-    qout << "Verbinde als: " << bot.nickName() << "@" << bot.host() << ":" << bot.port() << "..." << endl;
+	session.loadModule("TopicModule");
+	session.loadModule("MessageModule");
+	// session.loadModule("EchoModule");
+	// session.loadModule("GreetModule");
+
+    session.open();
+    qout << "Verbinde als: " << session.nickName() << "@" << session.host() << ":" << session.port() << "..." << endl;
     return app.exec();
 }

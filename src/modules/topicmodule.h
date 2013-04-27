@@ -24,7 +24,7 @@
 class TopicModule : public BotModule
 {
 public:
-	TopicModule(IrcBot* bot);
+	TopicModule(BotSession* session);
 	virtual ~TopicModule();
 
 public slots:

@@ -11,23 +11,30 @@
 #define IRCBOT_H
 
 #include <Communi/IrcSession>
+#include <Communi/IrcMessage>
 #include <QTextStream>
 #include <QStringList>
 
-class IrcBot : public IrcSession
+class BotModule;
+
+class BotSession : public IrcSession
 {
     Q_OBJECT
     Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
     Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
 
 public:
-    IrcBot(QObject* parent = 0);
+    BotSession(QObject* parent = 0);
 
     QStringList channels() const;
     void setChannels(const QStringList& channel);
 
 	QString nickservPassword() const;
 	void setNickservPassword(const QString& password);
+	void loadModule(const QString& module);
+
+	void sendMessage(const QString& target, const QString& message);
+	void sendAction(const QString& target, const QString& message);
 
 private slots:
     void onConnected();
@@ -37,6 +44,7 @@ private:
     QStringList m_channels;
     QString m_nickservPassword;
     QTextStream out;
+	QList<BotModule*> modules;
 };
 
 #endif // IRCBOT_H

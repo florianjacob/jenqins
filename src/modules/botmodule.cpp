@@ -18,15 +18,35 @@
 
 
 #include "botmodule.h"
+#include "echomodule.h"
+#include "greetmodule.h"
+#include "messagemodule.h"
+#include "topicmodule.h"
 
-BotModule::BotModule(IrcBot* bot) : QObject(bot), out(stdout)
+BotModule::BotModule(BotSession* session) : QObject(session), out(stdout)
 {
-	this->bot = bot;
+	this->session = session;
 }
 
 BotModule::~BotModule()
 {
 
 }
+
+BotModule* BotModule::createAndRegisterModule(QString module, BotSession* parent)
+{
+	if (module == "EchoModule") {
+		return new EchoModule(parent);
+	} else if (module == "GreetModule") {
+		return new GreetModule(parent);
+	} else if (module == "MessageModule") {
+		return new MessageModule(parent);
+	} else if (module == "TopicModule") {
+		return new TopicModule(parent);
+	} else {
+		return 0;
+	}
+}
+
 
 #include "botmodule.moc"

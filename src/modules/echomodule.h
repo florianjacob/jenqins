@@ -25,7 +25,7 @@ class EchoModule : public BotModule
 {
 
 public:
-    EchoModule(IrcBot* bot);
+    EchoModule(BotSession* session);
     virtual ~EchoModule();
 
 public slots:

@@ -22,21 +22,20 @@
 #include <QObject>
 #include <IrcMessage>
 #include <IrcCommand>
-#include "../ircbot.h"
+#include "../botsession.h"
 
 class BotModule : public QObject
 {
 	Q_OBJECT
 
 public:
-    BotModule(IrcBot* bot);
+    BotModule(BotSession* session);
     virtual ~BotModule();
 
-public slots:
-	virtual void onMessageReceived(IrcMessage* message) = 0;
+	static BotModule* createAndRegisterModule(QString module, BotSession* parent);
 
 protected:
-	IrcBot* bot;
+	BotSession* session;
 	QTextStream out;
 };
 

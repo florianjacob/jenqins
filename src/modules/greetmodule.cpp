@@ -20,8 +20,9 @@
 #include "greetmodule.h"
 #include <QTextStream>
 
-GreetModule::GreetModule(IrcBot* bot) : BotModule(bot)
+GreetModule::GreetModule(BotSession* session) : BotModule(session)
 {
+	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 
 }
 
@@ -34,13 +35,13 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 	if (message->type() == IrcMessage::Join) {
 			IrcJoinMessage* msg = static_cast<IrcJoinMessage*>(message);
 			QString name = msg->sender().name();
-			if (name != bot->nickName()) {
+			if (name != session->nickName()) {
 				QString greet = QString("Hi %1! Welcome in %2.").arg(name).arg(msg->channel());
-				bot->sendCommand(IrcCommand::createMessage(msg->channel(), greet));
+				session->sendMessage(msg->channel(), greet);
 				out << "Greeted " << name << "." << endl;
 			} else {
 				QString enter = QString("enters %1 and fades to the background, immediatly available when somebody needs his services.").arg(msg->channel());
-				bot->sendCommand(IrcCommand::createCtcpAction(msg->channel(), enter));
+				session->sendMessage(msg->channel(), enter);
 				out << "Joined " << msg->channel() << "." << endl;
 			}
 	} else if (message->type() == IrcMessage::Part) {
@@ -48,7 +49,7 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 			QString name = msg->sender().name();
 			QString bye = QString(" is shocked that %1 left %2 in favour of another channel.")
 			.arg(name).arg(msg->channel());
-			bot->sendCommand(IrcCommand::createCtcpAction(msg->channel(), bye));
+			session->sendAction(msg->channel(), bye);
 			out << "Said good-bye to " << name << "." << endl;
 			/*
 	} else if (message->type() == IrcMessage::Quit) {
