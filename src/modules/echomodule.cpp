@@ -44,3 +44,5 @@ void EchoModule::onMessageReceived(IrcMessage* message)
 	}
 
 }
+
+#include "echomodule.moc"

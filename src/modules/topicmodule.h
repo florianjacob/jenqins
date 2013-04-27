@@ -23,6 +23,7 @@
 
 class TopicModule : public BotModule
 {
+	Q_OBJECT
 public:
 	TopicModule(BotSession* session);
 	virtual ~TopicModule();

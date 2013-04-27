@@ -22,7 +22,6 @@
 TopicModule::TopicModule(BotSession* session) : BotModule(session)
 {
 	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
-
 }
 
 TopicModule::~TopicModule()
@@ -53,5 +52,6 @@ void TopicModule::onMessageReceived(IrcMessage* message)
 		}
 	}
 
-
 }
+
+#include "topicmodule.moc"

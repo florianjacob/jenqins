@@ -23,7 +23,7 @@
 
 class EchoModule : public BotModule
 {
-
+	Q_OBJECT
 public:
     EchoModule(BotSession* session);
     virtual ~EchoModule();
