@@ -14,11 +14,13 @@
 #include "modules/topicmodule.h"
 #include <Communi/IrcCommand>
 #include <Communi/IrcMessage>
+#include <QtCore/QTimer>
 
 
 BotSession::BotSession(QObject* parent) : IrcSession(parent), out(stdout)
 {
     connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
+    connect(this, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 
 	connect(this, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 
@@ -66,6 +68,14 @@ void BotSession::onConnected()
 	}
 
 }
+
+void BotSession::onDisconnected()
+{
+	out << "Disconnected. Reconnecting in 4 seconds." << endl;
+	close();
+	QTimer::singleShot(4000, this, "open");
+}
+
 
 void BotSession::onMessageReceived(IrcMessage* message)
 {

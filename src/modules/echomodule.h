@@ -25,11 +25,14 @@ class EchoModule : public BotModule
 {
 	Q_OBJECT
 public:
-    EchoModule(BotSession* session);
+    explicit EchoModule(BotSession* session);
     virtual ~EchoModule();
 
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
+
+private:
+	Q_DISABLE_COPY(EchoModule)
 };
 
 #endif // ECHOMODULE_H

@@ -29,14 +29,17 @@ class BotModule : public QObject
 	Q_OBJECT
 
 public:
-    BotModule(BotSession* session);
+    explicit BotModule(BotSession* session);
     virtual ~BotModule();
 
-	static BotModule* createAndRegisterModule(QString module, BotSession* parent);
+	static BotModule* createAndRegisterModule(const QString& module, BotSession* parent);
 
 protected:
 	BotSession* session;
 	QTextStream out;
+
+private:
+	Q_DISABLE_COPY(BotModule)
 };
 
 #endif // BOTMODULE_H

@@ -25,11 +25,13 @@ class TopicModule : public BotModule
 {
 	Q_OBJECT
 public:
-	TopicModule(BotSession* session);
+	explicit TopicModule(BotSession* session);
 	virtual ~TopicModule();
 
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
+private:
+	Q_DISABLE_COPY(TopicModule)
 };
 
 #endif // TOPICMODULE_H

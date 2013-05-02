@@ -23,17 +23,12 @@
 #include "messagemodule.h"
 #include "topicmodule.h"
 
-BotModule::BotModule(BotSession* session) : QObject(session), out(stdout)
-{
-	this->session = session;
-}
+BotModule::BotModule(BotSession* session) : QObject(session), session(session), out(stdout) { }
 
-BotModule::~BotModule()
-{
+BotModule::~BotModule() { }
 
-}
 
-BotModule* BotModule::createAndRegisterModule(QString module, BotSession* parent)
+BotModule* BotModule::createAndRegisterModule(const QString& module, BotSession* parent)
 {
 	if (module == "EchoModule") {
 		return new EchoModule(parent);

@@ -32,7 +32,10 @@ int main(int argc, char* argv[])
 	CleanExit cleanExit;
     QCoreApplication app(argc, argv);
 	BotSession session;
-    QTextStream qout(stdout);
+	QTextStream qout(stdout);
+
+	//qsrand(QTime::currentTime().msec());
+	//session->setNickName(QString("Guest%1").arg(qrand() % 99999));
 
     QSettings settings("settings.ini", QSettings::IniFormat);
     session.setHost(settings.value("host", "irc.freenode.net").toString());

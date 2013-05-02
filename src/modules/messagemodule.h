@@ -26,7 +26,7 @@ class MessageModule : public BotModule
 {
 	Q_OBJECT
 public:
-	MessageModule(BotSession* session);
+	explicit MessageModule(BotSession* session);
 	virtual ~MessageModule();
 
 public slots:
@@ -35,6 +35,7 @@ public slots:
 private:
 	void notifyAboutMemos(const QString& nick, const QString& channel = "a channel");
 	QHash<QString, QString> messages;
+	Q_DISABLE_COPY(MessageModule)
 };
 
 #endif // MESSAGEMODULE_H

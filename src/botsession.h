@@ -24,7 +24,7 @@ class BotSession : public IrcSession
     Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
 
 public:
-    BotSession(QObject* parent = 0);
+    explicit BotSession(QObject* parent = 0);
 
     QStringList channels() const;
     void setChannels(const QStringList& channel);
@@ -38,6 +38,7 @@ public:
 
 private slots:
     void onConnected();
+	void onDisconnected();
 	void onMessageReceived(IrcMessage* message);
 
 private:
@@ -45,6 +46,8 @@ private:
     QString m_nickservPassword;
     QTextStream out;
 	QList<BotModule*> modules;
+
+	Q_DISABLE_COPY(BotSession)
 };
 
 #endif // IRCBOT_H

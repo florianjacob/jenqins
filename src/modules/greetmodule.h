@@ -27,11 +27,14 @@ class GreetModule : public BotModule
 	Q_OBJECT
 
 public:
-    GreetModule(BotSession* session);
+    explicit GreetModule(BotSession* session);
     virtual ~GreetModule();
 
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
+
+private:
+	Q_DISABLE_COPY(GreetModule)
 };
 
 #endif // GREETMODULE_H
