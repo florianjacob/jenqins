@@ -27,12 +27,15 @@
 class BotModule : public QObject
 {
 	Q_OBJECT
+	Q_PROPERTY(QString helpText READ helpText)
 
 public:
     explicit BotModule(BotSession* session);
     virtual ~BotModule();
 
 	static BotModule* createAndRegisterModule(const QString& module, BotSession* parent);
+
+	virtual QString helpText() const = 0 ;
 
 protected:
 	BotSession* session;

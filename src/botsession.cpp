@@ -28,8 +28,14 @@ BotSession::BotSession(QObject* parent) : IrcSession(parent), out(stdout)
 
 void BotSession::loadModule(const QString& module) {
 	BotModule* m = BotModule::createAndRegisterModule(module, this);
-	modules.append(m);
+	m_modules.append(m);
 }
+
+QList< BotModule* > BotSession::modules() const
+{
+	return m_modules;
+}
+
 
 QStringList BotSession::channels() const
 {

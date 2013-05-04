@@ -29,6 +29,8 @@ public:
 	explicit MessageModule(BotSession* session);
 	virtual ~MessageModule();
 
+	virtual QString helpText() const;
+
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
 

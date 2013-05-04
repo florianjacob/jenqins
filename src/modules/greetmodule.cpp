@@ -62,4 +62,10 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 	}
 }
 
+QString GreetModule::helpText() const
+{
+    return QString("GreetModule: Comments joins and parts.");
+}
+
+
 #include "greetmodule.moc"

@@ -28,6 +28,8 @@ public:
 	explicit TopicModule(BotSession* session);
 	virtual ~TopicModule();
 
+	virtual QString helpText() const;
+
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
 private:

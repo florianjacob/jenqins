@@ -54,4 +54,10 @@ void TopicModule::onMessageReceived(IrcMessage* message)
 
 }
 
+QString TopicModule::helpText() const
+{
+	return QString("TopicModule: Set topic with '%1: topic <topic>'").arg(session->nickName());
+}
+
+
 #include "topicmodule.moc"

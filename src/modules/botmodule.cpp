@@ -22,6 +22,7 @@
 #include "greetmodule.h"
 #include "messagemodule.h"
 #include "topicmodule.h"
+#include "helpmodule.h"
 
 BotModule::BotModule(BotSession* session) : QObject(session), session(session), out(stdout) { }
 
@@ -38,6 +39,8 @@ BotModule* BotModule::createAndRegisterModule(const QString& module, BotSession*
 		return new MessageModule(parent);
 	} else if (module == "TopicModule") {
 		return new TopicModule(parent);
+	} else if (module == "HelpModule") {
+		return new HelpModule(parent);
 	} else {
 		return 0;
 	}

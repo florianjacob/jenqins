@@ -22,6 +22,7 @@ class BotSession : public IrcSession
     Q_OBJECT
     Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
     Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
+	Q_PROPERTY(QList<BotModule*> modules READ modules)
 
 public:
     explicit BotSession(QObject* parent = 0);
@@ -32,6 +33,7 @@ public:
 	QString nickservPassword() const;
 	void setNickservPassword(const QString& password);
 	void loadModule(const QString& module);
+	QList<BotModule*> modules() const;
 
 	void sendMessage(const QString& target, const QString& message);
 	void sendAction(const QString& target, const QString& message);
@@ -45,7 +47,7 @@ private:
     QStringList m_channels;
     QString m_nickservPassword;
     QTextStream out;
-	QList<BotModule*> modules;
+	QList<BotModule*> m_modules;
 
 	Q_DISABLE_COPY(BotSession)
 };

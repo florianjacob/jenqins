@@ -125,5 +125,10 @@ void MessageModule::notifyAboutMemos(const QString& nick, const QString& channel
 	}
 }
 
+QString MessageModule::helpText() const
+{
+	return QString("MessageModule: leave memos with '%1: memo <nickname> <message>'. Say anything in a public channel to retreive them.").arg(session->nickName());
+}
+
 
 #include "messagemodule.moc"

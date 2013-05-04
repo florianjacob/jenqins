@@ -28,6 +28,8 @@ public:
     explicit EchoModule(BotSession* session);
     virtual ~EchoModule();
 
+	virtual QString helpText() const;
+
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
 

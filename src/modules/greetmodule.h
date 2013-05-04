@@ -30,6 +30,8 @@ public:
     explicit GreetModule(BotSession* session);
     virtual ~GreetModule();
 
+	virtual QString helpText() const;
+
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
 

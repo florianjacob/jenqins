@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
 
 	session.loadModule("TopicModule");
 	session.loadModule("MessageModule");
+	session.loadModule("HelpModule");
 	// session.loadModule("EchoModule");
 	// session.loadModule("GreetModule");
 

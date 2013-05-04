@@ -29,6 +29,10 @@ EchoModule::~EchoModule()
 
 }
 
+QString EchoModule::helpText() const {
+	return QString("EchoModule: repeats every PM or channel message directed at the bot.");
+}
+
 void EchoModule::onMessageReceived(IrcMessage* message)
 {
 	if (message->type() == IrcMessage::Private) {
