@@ -32,9 +32,6 @@ public:
 
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
-
-private:
-	Q_DISABLE_COPY(EchoModule)
 };
 
 #endif // ECHOMODULE_H

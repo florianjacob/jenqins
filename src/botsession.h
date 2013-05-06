@@ -23,6 +23,7 @@ class BotSession : public IrcSession
     Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
     Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
 	Q_PROPERTY(QList<BotModule*> modules READ modules)
+	Q_DISABLE_COPY(BotSession)
 
 public:
     explicit BotSession(QObject* parent = 0);
@@ -49,7 +50,6 @@ private:
     QTextStream out;
 	QList<BotModule*> m_modules;
 
-	Q_DISABLE_COPY(BotSession)
 };
 
 #endif // IRCBOT_H

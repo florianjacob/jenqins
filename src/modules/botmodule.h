@@ -28,6 +28,7 @@ class BotModule : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString helpText READ helpText)
+	Q_DISABLE_COPY(BotModule)
 
 public:
     explicit BotModule(BotSession* session);
@@ -41,8 +42,6 @@ protected:
 	BotSession* session;
 	QTextStream out;
 
-private:
-	Q_DISABLE_COPY(BotModule)
 };
 
 #endif // BOTMODULE_H

@@ -15,6 +15,8 @@
 #include <iostream>
 #include <QTime>
 
+#include "modules/echomodule.h"
+
 #include <csignal>
 
 struct CleanExit{

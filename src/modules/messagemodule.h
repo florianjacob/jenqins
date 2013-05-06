@@ -37,7 +37,6 @@ public slots:
 private:
 	void notifyAboutMemos(const QString& nick, const QString& channel = "a channel");
 	QHash<QString, QString> messages;
-	Q_DISABLE_COPY(MessageModule)
 };
 
 #endif // MESSAGEMODULE_H

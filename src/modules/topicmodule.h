@@ -32,8 +32,6 @@ public:
 
 public slots:
 	virtual void onMessageReceived(IrcMessage* message);
-private:
-	Q_DISABLE_COPY(TopicModule)
 };
 
 #endif // TOPICMODULE_H
