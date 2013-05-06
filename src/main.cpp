@@ -13,6 +13,7 @@
 #include <QSslSocket>
 #include "botsession.h"
 #include <iostream>
+#include <QTime>
 
 #include <csignal>
 
@@ -35,8 +36,6 @@ int main(int argc, char* argv[])
 	BotSession session;
 	QTextStream qout(stdout);
 
-	//qsrand(QTime::currentTime().msec());
-	//session->setNickName(QString("Guest%1").arg(qrand() % 99999));
 
     QSettings settings("settings.ini", QSettings::IniFormat);
     session.setHost(settings.value("host", "irc.freenode.net").toString());
@@ -44,7 +43,10 @@ int main(int argc, char* argv[])
 	if (settings.value("ssl", "true").toBool()) {
 		session.setSocket(new QSslSocket());
 	}
-    session.setNickName(settings.value("nickname", "jenqins").toString());
+
+	qsrand(QTime::currentTime().msec());
+    session.setNickName(settings.value("nickname", QString("jenqins%1").arg(qrand() % 99999)).toString());
+
     session.setUserName(settings.value("username", session.nickName()).toString());
     session.setRealName(settings.value("realname", session.userName()).toString());
     session.setNickservPassword(settings.value("nickservpassword", "").toString());
