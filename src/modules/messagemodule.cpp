@@ -54,7 +54,7 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 		if (msg->target().compare(session->nickName(), Qt::CaseInsensitive) != 0) {
 			if (messages.contains(msg->sender().name())) {
 				out << "replaying messages for " << msg->sender().name() << ".." << endl;
-				foreach (QString message, messages.values(msg->sender().name()))
+				foreach (const QString& message, messages.values(msg->sender().name()))
 				{
 					session->sendMessage(msg->target(), message);
 				}
@@ -103,7 +103,7 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 		if (msg->code() == Irc::RPL_NAMREPLY) {
 			QString channel = msg->parameters().value(2);
 			QStringList nicks = msg->parameters().last().split(" ", QString::SkipEmptyParts);
-			foreach (QString nick, nicks)
+			foreach (const QString& nick, nicks)
 			{
 				notifyAboutMemos(nick, channel);
 			}

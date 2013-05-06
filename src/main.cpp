@@ -48,11 +48,12 @@ int main(int argc, char* argv[])
 	QStringList channels = concatenatedChannels.split(" ", QString::SkipEmptyParts);
     session.setChannels(channels);
 
-	session.loadModule("TopicModule");
-	session.loadModule("MessageModule");
-	session.loadModule("HelpModule");
-	// session.loadModule("EchoModule");
-	// session.loadModule("GreetModule");
+	QString concatenatedModules = settings.value("modules", "TopicModule MessageModule HelpModule").toString();
+	QStringList modules = concatenatedModules.split(" ", QString::SkipEmptyParts);
+	foreach (const QString& module, modules)
+	{
+		session.loadModule(module);
+	}
 
     session.open();
     qout << "Verbinde als: " << session.nickName() << "@" << session.host() << ":" << session.port() << "..." << endl;
