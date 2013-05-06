@@ -10,6 +10,7 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include <QTextStream>
+#include <QSslSocket>
 #include "botsession.h"
 #include <iostream>
 
@@ -39,7 +40,10 @@ int main(int argc, char* argv[])
 
     QSettings settings("settings.ini", QSettings::IniFormat);
     session.setHost(settings.value("host", "irc.freenode.net").toString());
-    session.setPort(settings.value("port", 6667).toInt());
+    session.setPort(settings.value("port", 7070).toInt());
+	if (settings.value("ssl", "true").toBool()) {
+		session.setSocket(new QSslSocket());
+	}
     session.setNickName(settings.value("nickname", "jenqins").toString());
     session.setUserName(settings.value("username", session.nickName()).toString());
     session.setRealName(settings.value("realname", session.userName()).toString());
@@ -54,6 +58,7 @@ int main(int argc, char* argv[])
 	{
 		session.loadModule(module);
 	}
+
 
     session.open();
     qout << "Verbinde als: " << session.nickName() << "@" << session.host() << ":" << session.port() << "..." << endl;
