@@ -20,6 +20,7 @@
 #ifndef BOTMODULE_H
 #define BOTMODULE_H
 #include <QObject>
+#include <QMetaObject>
 #include <IrcMessage>
 #include <IrcCommand>
 #include "../botsession.h"
@@ -33,8 +34,7 @@ class BotModule : public QObject
 public:
     explicit BotModule(BotSession* session);
     virtual ~BotModule();
-
-	static BotModule* createAndRegisterModule(const QString& module, BotSession* parent);
+	static const QMetaObject* metaObjectFor(const QString& moduleName);
 
 	virtual QString helpText() const = 0 ;
 

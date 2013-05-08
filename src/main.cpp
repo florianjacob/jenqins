@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 	QStringList channels = concatenatedChannels.split(" ", QString::SkipEmptyParts);
     session.setChannels(channels);
 
-	QString concatenatedModules = settings.value("modules", "TopicModule MessageModule HelpModule").toString();
+	QString concatenatedModules = settings.value("modules", "topic memo help").toString();
 	QStringList modules = concatenatedModules.split(" ", QString::SkipEmptyParts);
 	foreach (const QString& module, modules)
 	{

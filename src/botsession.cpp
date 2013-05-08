@@ -8,13 +8,10 @@
  */
 
 #include "botsession.h"
-#include "modules/greetmodule.h"
-#include "modules/echomodule.h"
-#include "modules/messagemodule.h"
-#include "modules/topicmodule.h"
 #include <Communi/IrcCommand>
 #include <Communi/IrcMessage>
 #include <QtCore/QTimer>
+#include "modules/botmodule.h"
 
 
 BotSession::BotSession(QObject* parent) : IrcSession(parent), out(stdout)
@@ -26,9 +23,14 @@ BotSession::BotSession(QObject* parent) : IrcSession(parent), out(stdout)
 
 }
 
-void BotSession::loadModule(const QString& module) {
-	BotModule* m = BotModule::createAndRegisterModule(module, this);
-	m_modules.append(m);
+void BotSession::loadModule(const QString& moduleName) {
+	const QMetaObject* metaObject = BotModule::metaObjectFor(moduleName);
+	if (metaObject) {
+		BotModule* module = qobject_cast<BotModule*>(metaObject->newInstance(Q_ARG(BotSession*, this)));
+		m_modules.append(module);
+	} else {
+		out << moduleName << " is not a known module. Ignoring it." << endl;
+	}
 }
 
 QList< BotModule* > BotSession::modules() const

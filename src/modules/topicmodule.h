@@ -25,7 +25,7 @@ class TopicModule : public BotModule
 {
 	Q_OBJECT
 public:
-	explicit TopicModule(BotSession* session);
+	Q_INVOKABLE explicit TopicModule(BotSession* session);
 	virtual ~TopicModule();
 
 	virtual QString helpText() const;

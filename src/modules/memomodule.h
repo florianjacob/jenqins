@@ -17,17 +17,17 @@
 */
 
 
-#ifndef MESSAGEMODULE_H
-#define MESSAGEMODULE_H
+#ifndef MEMOMODULE_H
+#define MEMOMODULE_H
 #include "botmodule.h"
 #include <QHash>
 
-class MessageModule : public BotModule
+class MemoModule : public BotModule
 {
 	Q_OBJECT
 public:
-	explicit MessageModule(BotSession* session);
-	virtual ~MessageModule();
+	Q_INVOKABLE explicit MemoModule(BotSession* session);
+	virtual ~MemoModule();
 
 	virtual QString helpText() const;
 
@@ -36,7 +36,7 @@ public slots:
 
 private:
 	void notifyAboutMemos(const QString& nick, const QString& channel = "a channel");
-	QHash<QString, QString> messages;
+	QHash<QString, QString> memos;
 };
 
 #endif // MESSAGEMODULE_H

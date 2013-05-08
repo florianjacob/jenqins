@@ -20,7 +20,7 @@
 #include "botmodule.h"
 #include "echomodule.h"
 #include "greetmodule.h"
-#include "messagemodule.h"
+#include "memomodule.h"
 #include "topicmodule.h"
 #include "helpmodule.h"
 
@@ -29,21 +29,18 @@ BotModule::BotModule(BotSession* session) : QObject(session), session(session), 
 BotModule::~BotModule() { }
 
 
-BotModule* BotModule::createAndRegisterModule(const QString& module, BotSession* parent)
+const QMetaObject* BotModule::metaObjectFor(const QString& moduleName)
 {
-	if (module == "EchoModule") {
-		return new EchoModule(parent);
-	} else if (module == "GreetModule") {
-		return new GreetModule(parent);
-	} else if (module == "MessageModule") {
-		return new MessageModule(parent);
-	} else if (module == "TopicModule") {
-		return new TopicModule(parent);
-	} else if (module == "HelpModule") {
-		return new HelpModule(parent);
-	} else {
-		return 0;
+	static QHash<QString, const QMetaObject*> metaObjects;
+	if (metaObjects.isEmpty()) {
+		metaObjects.insert("ECHO", &EchoModule::staticMetaObject);
+		metaObjects.insert("GREET", &GreetModule::staticMetaObject);
+		metaObjects.insert("MEMO", &MemoModule::staticMetaObject);
+		metaObjects.insert("TOPIC", &TopicModule::staticMetaObject);
+		metaObjects.insert("HELP", &HelpModule::staticMetaObject);
 	}
+
+	return metaObjects.value(moduleName.toUpper());
 }
 
 

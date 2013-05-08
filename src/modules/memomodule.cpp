@@ -17,48 +17,48 @@
  */
 
 
-#include "messagemodule.h"
+#include "memomodule.h"
 #include <QTime>
 #include <QFile>
 #include <QDataStream>
 #include <Irc>
 
-MessageModule::MessageModule(BotSession* session): BotModule(session)
+MemoModule::MemoModule(BotSession* session): BotModule(session)
 {
-	QFile file("messages.dat");
+	QFile file("memos.dat");
 	if (file.exists()) {
 		file.open(QIODevice::ReadOnly);
 		QDataStream dataIn(&file);    // read the data serialized from the file
-		dataIn >> messages;
-		out << "messages loaded." << endl;
+		dataIn >> memos;
+		out << "memos loaded." << endl;
 	}
 	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 }
 
-MessageModule::~MessageModule()
+MemoModule::~MemoModule()
 {
-	QFile file("messages.dat");
+	QFile file("memos.dat");
 	file.open(QIODevice::WriteOnly);
 	QDataStream dataOut(&file);   // we will serialize the data into the file
-	dataOut << messages;
-	out << "messages saved." << endl;
+	dataOut << memos;
+	out << "memos saved." << endl;
 }
 
 
-void MessageModule::onMessageReceived(IrcMessage* message)
+void MemoModule::onMessageReceived(IrcMessage* message)
 {
 	if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
 
 		// is the message not a direct message => a message from a channel?
 		if (msg->target().compare(session->nickName(), Qt::CaseInsensitive) != 0) {
-			if (messages.contains(msg->sender().name())) {
-				out << "replaying messages for " << msg->sender().name() << ".." << endl;
-				foreach (const QString& message, messages.values(msg->sender().name()))
+			if (memos.contains(msg->sender().name())) {
+				out << "replaying memos for " << msg->sender().name() << ".." << endl;
+				foreach (const QString& message, memos.values(msg->sender().name()))
 				{
 					session->sendMessage(msg->target(), message);
 				}
-				messages.remove(msg->sender().name());
+				memos.remove(msg->sender().name());
 			}
 
 			if (msg->message().startsWith(session->nickName(), Qt::CaseInsensitive)) {
@@ -79,7 +79,7 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 						} else if (receiver.contains(":")) {
 							session->sendMessage(msg->target(), msg->sender().name() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?"));
 						} else {
-							messages.insertMulti(receiver,
+							memos.insertMulti(receiver,
 												 QString("%1: [%2] <%3/%4> %5")
 												 .arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
 							.arg(msg->target()).arg(msg->sender().name()).arg(parts.join(" ")));
@@ -92,7 +92,7 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 		}
 
 	} else if (message->type() == IrcMessage::Join) {
-		// we get join messages from all users in the channel at startup, so this gets also called
+		// we get join memos from all users in the channel at startup, so this gets also called
 		// for every user in the channel we joined
 		notifyAboutMemos(message->sender().name());
 	} else if (message->type() == IrcMessage::Nick) {
@@ -111,24 +111,24 @@ void MessageModule::onMessageReceived(IrcMessage* message)
 	}
 }
 
-void MessageModule::notifyAboutMemos(const QString& nick, const QString& channel)
+void MemoModule::notifyAboutMemos(const QString& nick, const QString& channel)
 {
-	if (messages.contains(nick)) {
-		out << "Notifying " << nick << " about his messages." << endl;
+	if (memos.contains(nick)) {
+		out << "Notifying " << nick << " about his memos." << endl;
 		session->sendMessage(nick, QString("You have memos. Speak publicly in %1 to retreive them.").arg(channel));
 	} else {
 		QString shortenedNick(nick.left(nick.size() - 1));
-		if (messages.contains(shortenedNick)) {
-			out << "Notifying " << nick << " about messages for " << shortenedNick << "." << endl;
+		if (memos.contains(shortenedNick)) {
+			out << "Notifying " << nick << " about memos for " << shortenedNick << "." << endl;
 			session->sendMessage(nick, QString("%1 has memos. Is that you? Change your nick back and speak publicly in %2 to retreive them.").arg(shortenedNick).arg(channel));
 		}
 	}
 }
 
-QString MessageModule::helpText() const
+QString MemoModule::helpText() const
 {
-	return QString("MessageModule: leave memos with '%1: memo <nickname> <message>'. Say anything in a public channel to retreive them.").arg(session->nickName());
+	return QString("MemoModule: leave memos with '%1: memo <nickname> <message>'. Say anything in a public channel to retreive them.").arg(session->nickName());
 }
 
 
-#include "messagemodule.moc"
+#include "memomodule.moc"
