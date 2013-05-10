@@ -22,6 +22,7 @@
 EchoModule::EchoModule(BotSession* session) : BotModule(session)
 {
 	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+	qDebug() << "EchoModule connected.";
 }
 
 EchoModule::~EchoModule()
@@ -40,10 +41,12 @@ void EchoModule::onMessageReceived(IrcMessage* message)
 		if (!msg->target().compare(session->nickName(), Qt::CaseInsensitive)) {
 			// echo private message
 			session->sendMessage(msg->sender().name(), msg->message());
+			qDebug() << "Echoed private <" << msg->sender().name() <<  ">" << msg->message() << ".";
 		} else if (msg->message().startsWith(session->nickName(), Qt::CaseInsensitive)) {
 			// echo prefixed channel message
 			QString reply = msg->message().mid(msg->message().indexOf(" "));
 			session->sendMessage(msg->target(), msg->sender().name() + ":" + reply);
+			qDebug() << "Echoed public <" << msg->sender().name() <<  ">" << msg->message() << ".";
 		}
 	}
 

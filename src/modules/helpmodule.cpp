@@ -22,6 +22,7 @@
 HelpModule::HelpModule(BotSession* session) : BotModule(session)
 {
 	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+	qDebug() << "HelpModule connected.";
 }
 
 HelpModule::~HelpModule()
@@ -42,16 +43,13 @@ void HelpModule::onMessageReceived(IrcMessage* message)
 			if (msg->message().startsWith(session->nickName(), Qt::CaseInsensitive)) {
 				// message is for bot
 				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
-				if (parts.size() >= 2) {
-					parts.removeFirst();
-
-					if (parts.first() == "help") {
-						session->sendMessage(msg->target(), QString("I can provide you with the following services:"));
-						foreach (BotModule* module, session->modules())
-						{
-							session->sendMessage(msg->target(), module->helpText());
-						}
+				if (parts.size() >= 2 && parts[1] == "help") {
+					session->sendMessage(msg->target(), QString("I can provide you with the following services:"));
+					foreach (BotModule* module, session->modules())
+					{
+						session->sendMessage(msg->target(), module->helpText());
 					}
+					qDebug() << "Helped out" << msg->target();
 				}
 			}
 		}

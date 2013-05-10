@@ -11,6 +11,7 @@
 #include <Communi/IrcCommand>
 #include <Communi/IrcMessage>
 #include <QtCore/QTimer>
+#include <QDebug>
 #include "modules/botmodule.h"
 
 
@@ -63,15 +64,15 @@ void BotSession::setNickservPassword(const QString& password)
 
 void BotSession::onConnected()
 {
-	out << "Verbunden." << endl;
+	out << "Connected." << endl;
 	if (!m_nickservPassword.isEmpty()) {
 		sendCommand(IrcCommand::createMessage(QString("NickServ"), QString("identify ") + m_nickservPassword));
-		out << "tried to auth with nickserv." << endl;
+		out << "Trying to auth with nickserv..." << endl;
 	} else {
 		foreach (QString channel, m_channels)
 		{
 			sendCommand(IrcCommand::createJoin(channel));
-			out << "Betrete " << channel << "." << endl;
+			out << "Entering " << channel << "." << endl;
 		}
 	}
 
@@ -79,7 +80,7 @@ void BotSession::onConnected()
 
 void BotSession::onDisconnected()
 {
-	out << "Disconnected. Reconnecting in 4 seconds." << endl;
+	out << "Disconnected. Reconnecting in 4 seconds..." << endl;
 	close();
 	QTimer::singleShot(4000, this, "open");
 }
@@ -89,15 +90,15 @@ void BotSession::onMessageReceived(IrcMessage* message)
 {
 	if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-		out << "[PM] <" << msg->sender().name() << " > " << msg->message() << endl;
+		qDebug() << "[PM] <" << msg->sender().name() << ">" << msg->message();
 	} else if (message->type() == IrcMessage::Notice) {
 		IrcNoticeMessage* msg = static_cast<IrcNoticeMessage*>(message);
-		out << "[Notice] " << msg->message() << endl;
+		qDebug() << "[Notice]" << msg->message();
 		if (msg->message().startsWith("You are now identified for ")) {
 			foreach (QString channel, m_channels)
 			{
 				sendCommand(IrcCommand::createJoin(channel));
-				out << "Betrete " << channel << "." << endl;
+				out << "Entering " << channel << "." << endl;
 			}
 		}
 	} else if (message->type() == IrcMessage::Error) {

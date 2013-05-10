@@ -14,6 +14,7 @@
 #include "botsession.h"
 #include <iostream>
 #include <QTime>
+#include <QDebug>
 
 #include "modules/echomodule.h"
 
@@ -26,7 +27,7 @@ struct CleanExit{
 	}
 
 	static void exitQt(int sig) {
-		std::cout << "exiting.." << std::endl;
+		std::cout << std::endl << "shutting down..." << std::endl;
 		QCoreApplication::exit(0);
 	}
 };
@@ -37,7 +38,6 @@ int main(int argc, char* argv[])
     QCoreApplication app(argc, argv);
 	BotSession session;
 	QTextStream qout(stdout);
-
 
     QSettings settings("settings.ini", QSettings::IniFormat);
     session.setHost(settings.value("host", "irc.freenode.net").toString());
@@ -65,6 +65,6 @@ int main(int argc, char* argv[])
 
 
     session.open();
-    qout << "Verbinde als: " << session.nickName() << "@" << session.host() << ":" << session.port() << "..." << endl;
+    qout << "Connecting " << (settings.value("ssl", "true").toBool() ? "securely " : "") <<  "as: " << session.nickName() << "@" << session.host() << ":" << session.port() << "..." << endl;
     return app.exec();
 }

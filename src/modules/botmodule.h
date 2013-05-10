@@ -23,6 +23,7 @@
 #include <QMetaObject>
 #include <IrcMessage>
 #include <IrcCommand>
+#include <QDebug>
 #include "../botsession.h"
 
 class BotModule : public QObject

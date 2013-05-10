@@ -23,6 +23,7 @@
 GreetModule::GreetModule(BotSession* session) : BotModule(session)
 {
 	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+	qDebug() << "GreetModule connected.";
 
 }
 
@@ -38,11 +39,11 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 			if (name != session->nickName()) {
 				QString greet = QString("Hi %1! Welcome in %2.").arg(name).arg(msg->channel());
 				session->sendMessage(msg->channel(), greet);
-				out << "Greeted " << name << "." << endl;
+				qDebug() << "Greeted" << name << ".";
 			} else {
 				QString enter = QString("enters %1 and fades to the background, immediatly available when somebody needs his services.").arg(msg->channel());
 				session->sendMessage(msg->channel(), enter);
-				out << "Joined " << msg->channel() << "." << endl;
+				qDebug() << "Commented join in " << msg->channel() << ".";
 			}
 	} else if (message->type() == IrcMessage::Part) {
 			IrcPartMessage* msg = static_cast<IrcPartMessage*>(message);
@@ -50,7 +51,7 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 			QString bye = QString(" is shocked that %1 left %2 in favour of another channel.")
 			.arg(name).arg(msg->channel());
 			session->sendAction(msg->channel(), bye);
-			out << "Said good-bye to " << name << "." << endl;
+			qDebug() << "Said good-bye to" << name << ".";
 			/*
 	} else if (message->type() == IrcMessage::Quit) {
 			IrcQuitMessage* msg = static_cast<IrcQuitMessage*>(message);

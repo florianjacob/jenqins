@@ -30,9 +30,12 @@ MemoModule::MemoModule(BotSession* session): BotModule(session)
 		file.open(QIODevice::ReadOnly);
 		QDataStream dataIn(&file);    // read the data serialized from the file
 		dataIn >> memos;
-		out << "memos loaded." << endl;
+		out << "Memos loaded." << endl;
+	} else {
+		out << "No memo file found." << endl;
 	}
 	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+	qDebug() << "MemoModule connected.";
 }
 
 MemoModule::~MemoModule()
@@ -41,7 +44,7 @@ MemoModule::~MemoModule()
 	file.open(QIODevice::WriteOnly);
 	QDataStream dataOut(&file);   // we will serialize the data into the file
 	dataOut << memos;
-	out << "memos saved." << endl;
+	out << "Memos saved." << endl;
 }
 
 
@@ -53,11 +56,13 @@ void MemoModule::onMessageReceived(IrcMessage* message)
 		// is the message not a direct message => a message from a channel?
 		if (msg->target().compare(session->nickName(), Qt::CaseInsensitive) != 0) {
 			if (memos.contains(msg->sender().name())) {
-				out << "replaying memos for " << msg->sender().name() << ".." << endl;
+				qDebug() << "Replaying memos for" << msg->sender().name() << "in" << msg->target() << "...";
 				foreach (const QString& message, memos.values(msg->sender().name()))
 				{
 					session->sendMessage(msg->target(), message);
+					qDebug() << message;
 				}
+				qDebug() << "done.";
 				memos.remove(msg->sender().name());
 			}
 
@@ -79,12 +84,13 @@ void MemoModule::onMessageReceived(IrcMessage* message)
 						} else if (receiver.contains(":")) {
 							session->sendMessage(msg->target(), msg->sender().name() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?"));
 						} else {
-							memos.insertMulti(receiver,
-												 QString("%1: [%2] <%3/%4> %5")
-												 .arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
-							.arg(msg->target()).arg(msg->sender().name()).arg(parts.join(" ")));
+							QString memo = QString("%1: [%2] <%3/%4> %5")
+												.arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
+												.arg(msg->target()).arg(msg->sender().name()).arg(parts.join(" "));
+							memos.insertMulti(receiver, memo);
 							session->sendMessage(msg->target(), QString("%1: Memo for %2 recorded.").arg(msg->sender().name()).arg(receiver));
 							session->sendCommand(IrcCommand::createNames(session->channels()));
+							qDebug() << "Recorded memo for" << receiver << ":" << memo;
 						}
 					}
 				}
@@ -114,12 +120,12 @@ void MemoModule::onMessageReceived(IrcMessage* message)
 void MemoModule::notifyAboutMemos(const QString& nick, const QString& channel)
 {
 	if (memos.contains(nick)) {
-		out << "Notifying " << nick << " about his memos." << endl;
+		qDebug() << "Notifying" << nick << "about his memos.";
 		session->sendMessage(nick, QString("You have memos. Speak publicly in %1 to retreive them.").arg(channel));
 	} else {
 		QString shortenedNick(nick.left(nick.size() - 1));
 		if (memos.contains(shortenedNick)) {
-			out << "Notifying " << nick << " about memos for " << shortenedNick << "." << endl;
+			qDebug() << "Notifying" << nick << "about memos for" << shortenedNick << ".";
 			session->sendMessage(nick, QString("%1 has memos. Is that you? Change your nick back and speak publicly in %2 to retreive them.").arg(shortenedNick).arg(channel));
 		}
 	}

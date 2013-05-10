@@ -22,6 +22,7 @@
 TopicModule::TopicModule(BotSession* session) : BotModule(session)
 {
 	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+	qDebug() << "TopicModule connected.";
 }
 
 TopicModule::~TopicModule()
@@ -44,7 +45,7 @@ void TopicModule::onMessageReceived(IrcMessage* message)
 
 					if (parts.first() == "topic") {
 						parts.removeFirst();
-						out << "Setting topic for " << msg->target() << " to " << parts.join(" ") << endl;
+						qDebug() << "Setting topic for" << msg->target() << "to" << parts.join(" ");
 						session->sendCommand(IrcCommand::createTopic(msg->target(), parts.join(" ")));
 					}
 				}
