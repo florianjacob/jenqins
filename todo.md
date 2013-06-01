@@ -5,3 +5,4 @@
 		* Highscore für roulette und blackjack
 	* reconnect nach disconnect
 	* QT_NO_DEBUG_OUTPUT über cmake definieren wenn Debugausgaben nicht erwünscht
+	* Zeitliche Abfolge der memos erhalten
