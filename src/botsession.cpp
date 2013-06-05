@@ -82,7 +82,7 @@ void BotSession::onDisconnected()
 {
 	out << "Disconnected. Reconnecting in 4 seconds..." << endl;
 	close();
-	QTimer::singleShot(4000, this, SLOT("open"));
+	QTimer::singleShot(4000, this, SLOT(open()));
 }
 
 
