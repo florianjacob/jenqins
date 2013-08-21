@@ -21,10 +21,10 @@
 #define BOTMODULE_H
 #include <QObject>
 #include <QMetaObject>
-#include <IrcMessage>
-#include <IrcCommand>
+#include <Communi/IrcCore/IrcMessage>
+#include <Communi/IrcCore/IrcCommand>
 #include <QDebug>
-#include "../botsession.h"
+#include "../botconnection.h"
 
 class BotModule : public QObject
 {
@@ -33,14 +33,14 @@ class BotModule : public QObject
 	Q_DISABLE_COPY(BotModule)
 
 public:
-    explicit BotModule(BotSession* session);
+    explicit BotModule(BotConnection* session);
     virtual ~BotModule();
 	static const QMetaObject* metaObjectFor(const QString& moduleName);
 
 	virtual QString helpText() const = 0 ;
 
 protected:
-	BotSession* session;
+	BotConnection* connection;
 	QTextStream out;
 
 };

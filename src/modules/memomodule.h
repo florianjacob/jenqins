@@ -26,7 +26,7 @@ class MemoModule : public BotModule
 {
 	Q_OBJECT
 public:
-	Q_INVOKABLE explicit MemoModule(BotSession* session);
+	Q_INVOKABLE explicit MemoModule(BotConnection* connection);
 	virtual ~MemoModule();
 
 	virtual QString helpText() const;

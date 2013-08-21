@@ -7,26 +7,26 @@
  * completely or partially.
  */
 
-#ifndef IRCBOT_H
-#define IRCBOT_H
+#ifndef BOTCONNECTION_H
+#define BOTCONNECTION_H
 
-#include <Communi/IrcSession>
-#include <Communi/IrcMessage>
+#include <Communi/IrcCore/IrcConnection>
+#include <Communi/IrcCore/IrcMessage>
 #include <QTextStream>
 #include <QStringList>
 
 class BotModule;
 
-class BotSession : public IrcSession
+class BotConnection : public IrcConnection
 {
     Q_OBJECT
     Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
     Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
 	Q_PROPERTY(QList<BotModule*> modules READ modules)
-	Q_DISABLE_COPY(BotSession)
+	Q_DISABLE_COPY(BotConnection)
 
 public:
-    explicit BotSession(QObject* parent = 0);
+    explicit BotConnection(QObject* parent = 0);
 
     QStringList channels() const;
     void setChannels(const QStringList& channel);

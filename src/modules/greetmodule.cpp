@@ -19,10 +19,11 @@
 
 #include "greetmodule.h"
 #include <QTextStream>
+#include <IrcSender>
 
-GreetModule::GreetModule(BotSession* session) : BotModule(session)
+GreetModule::GreetModule(BotConnection* connection) : BotModule(connection)
 {
-	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+	connect(connection, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 	qDebug() << "GreetModule connected.";
 
 }
@@ -35,23 +36,25 @@ GreetModule::~GreetModule()
 void GreetModule::onMessageReceived(IrcMessage* message) {
 	if (message->type() == IrcMessage::Join) {
 			IrcJoinMessage* msg = static_cast<IrcJoinMessage*>(message);
-			QString name = msg->sender().name();
-			if (name != session->nickName()) {
-				QString greet = QString("Hi %1! Welcome in %2.").arg(name).arg(msg->channel());
-				session->sendMessage(msg->channel(), greet);
-				qDebug() << "Greeted" << name << ".";
+			IrcSender sender(msg->prefix());
+
+			if (sender.name() != connection->nickName()) {
+				QString greet = QString("Hi %1! Welcome in %2.").arg(sender.name()).arg(msg->channel());
+				connection->sendMessage(msg->channel(), greet);
+				qDebug() << "Greeted" << sender.name() << ".";
 			} else {
 				QString enter = QString("enters %1 and fades to the background, immediatly available when somebody needs his services.").arg(msg->channel());
-				session->sendMessage(msg->channel(), enter);
+				connection->sendMessage(msg->channel(), enter);
 				qDebug() << "Commented join in " << msg->channel() << ".";
 			}
 	} else if (message->type() == IrcMessage::Part) {
 			IrcPartMessage* msg = static_cast<IrcPartMessage*>(message);
-			QString name = msg->sender().name();
+			IrcSender sender(msg->prefix());
+
 			QString bye = QString(" is shocked that %1 left %2 in favour of another channel.")
-			.arg(name).arg(msg->channel());
-			session->sendAction(msg->channel(), bye);
-			qDebug() << "Said good-bye to" << name << ".";
+			.arg(sender.name()).arg(msg->channel());
+			connection->sendAction(msg->channel(), bye);
+			qDebug() << "Said good-bye to" << sender.name() << ".";
 			/*
 	} else if (message->type() == IrcMessage::Quit) {
 			IrcQuitMessage* msg = static_cast<IrcQuitMessage*>(message);

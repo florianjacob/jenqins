@@ -11,7 +11,7 @@
 #include <QSettings>
 #include <QTextStream>
 #include <QSslSocket>
-#include "botsession.h"
+#include "botconnection.h"
 #include <iostream>
 #include <QTime>
 #include <QDebug>
@@ -36,35 +36,35 @@ int main(int argc, char* argv[])
 {
 	CleanExit cleanExit;
     QCoreApplication app(argc, argv);
-	BotSession session;
+	BotConnection connection;
 	QTextStream qout(stdout);
 
     QSettings settings("settings.ini", QSettings::IniFormat);
-    session.setHost(settings.value("host", "irc.freenode.net").toString());
-    session.setPort(settings.value("port", 7070).toInt());
+    connection.setHost(settings.value("host", "irc.freenode.net").toString());
+    connection.setPort(settings.value("port", 7070).toInt());
 	if (settings.value("ssl", "true").toBool()) {
-		session.setSocket(new QSslSocket());
+		connection.setSocket(new QSslSocket());
 	}
 
 	qsrand(QTime::currentTime().msec());
-    session.setNickName(settings.value("nickname", QString("jenqins%1").arg(qrand() % 99999)).toString());
+    connection.setNickName(settings.value("nickname", QString("jenqins%1").arg(qrand() % 99999)).toString());
 
-    session.setUserName(settings.value("username", session.nickName()).toString());
-    session.setRealName(settings.value("realname", session.userName()).toString());
-    session.setNickservPassword(settings.value("nickservpassword", "").toString());
+    connection.setUserName(settings.value("username", connection.nickName()).toString());
+    connection.setRealName(settings.value("realname", connection.userName()).toString());
+    connection.setNickservPassword(settings.value("nickservpassword", "").toString());
 	QString concatenatedChannels = settings.value("channels", "#ceylon").toString();
 	QStringList channels = concatenatedChannels.split(" ", QString::SkipEmptyParts);
-    session.setChannels(channels);
+    connection.setChannels(channels);
 
 	QString concatenatedModules = settings.value("modules", "topic memo help").toString();
 	QStringList modules = concatenatedModules.split(" ", QString::SkipEmptyParts);
 	foreach (const QString& module, modules)
 	{
-		session.loadModule(module);
+		connection.loadModule(module);
 	}
 
 
-    session.open();
-    qout << "Connecting " << (settings.value("ssl", "true").toBool() ? "securely " : "") <<  "as: " << session.nickName() << "@" << session.host() << ":" << session.port() << "..." << endl;
+    connection.open();
+    qout << "Connecting " << (settings.value("ssl", "true").toBool() ? "securely " : "") <<  "as: " << connection.nickName() << "@" << connection.host() << ":" << connection.port() << "..." << endl;
     return app.exec();
 }

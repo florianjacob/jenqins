@@ -27,7 +27,7 @@ class GreetModule : public BotModule
 	Q_OBJECT
 
 public:
-    Q_INVOKABLE explicit GreetModule(BotSession* session);
+    Q_INVOKABLE explicit GreetModule(BotConnection* connection);
     virtual ~GreetModule();
 
 	virtual QString helpText() const;

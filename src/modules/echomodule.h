@@ -25,7 +25,7 @@ class EchoModule : public BotModule
 {
 	Q_OBJECT
 public:
-    Q_INVOKABLE explicit EchoModule(BotSession* session);
+    Q_INVOKABLE explicit EchoModule(BotConnection* connection);
     virtual ~EchoModule();
 
 	virtual QString helpText() const;

@@ -19,9 +19,9 @@
 
 #include "helpmodule.h"
 
-HelpModule::HelpModule(BotSession* session) : BotModule(session)
+HelpModule::HelpModule(BotConnection* connection) : BotModule(connection)
 {
-	connect(session, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+	connect(connection, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
 	qDebug() << "HelpModule connected.";
 }
 
@@ -38,16 +38,16 @@ void HelpModule::onMessageReceived(IrcMessage* message)
 {
 	if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-		if (msg->target().compare(session->nickName(), Qt::CaseInsensitive) != 0) {
+		if (msg->target().compare(connection->nickName(), Qt::CaseInsensitive) != 0) {
 			// message is from channel
-			if (msg->message().startsWith(session->nickName(), Qt::CaseInsensitive)) {
+			if (msg->message().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
 				// message is for bot
 				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
 				if (parts.size() >= 2 && parts[1] == "help") {
-					session->sendMessage(msg->target(), QString("I can provide you with the following services:"));
-					foreach (BotModule* module, session->modules())
+					connection->sendMessage(msg->target(), QString("I can provide you with the following services:"));
+					foreach (BotModule* module, connection->modules())
 					{
-						session->sendMessage(msg->target(), module->helpText());
+						connection->sendMessage(msg->target(), module->helpText());
 					}
 					qDebug() << "Helped out" << msg->target();
 				}

@@ -24,7 +24,7 @@
 #include "topicmodule.h"
 #include "helpmodule.h"
 
-BotModule::BotModule(BotSession* session) : QObject(session), session(session), out(stdout) { }
+BotModule::BotModule(BotConnection* connection) : QObject(connection), connection(connection), out(stdout) { }
 
 BotModule::~BotModule() { }
 
