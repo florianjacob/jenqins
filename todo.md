@@ -13,3 +13,4 @@
 	    - void xxxMessageReceived(IrcXxxMessage* message)
 		- void nickNameReserved(QString* alternate)
 	* - Added IrcSession::quit() slot for convenience
+	* SASL-Unterstützung zwecks Login, oder per nick:password als Serverpasswort
