@@ -19,7 +19,6 @@
 
 #include "greetmodule.h"
 #include <QTextStream>
-#include <IrcSender>
 
 GreetModule::GreetModule(BotConnection* connection) : BotModule(connection)
 {
@@ -36,12 +35,11 @@ GreetModule::~GreetModule()
 void GreetModule::onMessageReceived(IrcMessage* message) {
 	if (message->type() == IrcMessage::Join) {
 			IrcJoinMessage* msg = static_cast<IrcJoinMessage*>(message);
-			IrcSender sender(msg->prefix());
 
-			if (sender.name() != connection->nickName()) {
-				QString greet = QString("Hi %1! Welcome in %2.").arg(sender.name()).arg(msg->channel());
+			if (msg->nick() != connection->nickName()) {
+				QString greet = QString("Hi %1! Welcome in %2.").arg(msg->nick()).arg(msg->channel());
 				connection->sendMessage(msg->channel(), greet);
-				qDebug() << "Greeted" << sender.name() << ".";
+				qDebug() << "Greeted" << msg->nick() << ".";
 			} else {
 				QString enter = QString("enters %1 and fades to the background, immediatly available when somebody needs his services.").arg(msg->channel());
 				connection->sendMessage(msg->channel(), enter);
@@ -49,12 +47,11 @@ void GreetModule::onMessageReceived(IrcMessage* message) {
 			}
 	} else if (message->type() == IrcMessage::Part) {
 			IrcPartMessage* msg = static_cast<IrcPartMessage*>(message);
-			IrcSender sender(msg->prefix());
 
 			QString bye = QString(" is shocked that %1 left %2 in favour of another channel.")
-			.arg(sender.name()).arg(msg->channel());
+			.arg(msg->nick()).arg(msg->channel());
 			connection->sendAction(msg->channel(), bye);
-			qDebug() << "Said good-bye to" << sender.name() << ".";
+			qDebug() << "Said good-bye to" << msg->nick() << ".";
 			/*
 	} else if (message->type() == IrcMessage::Quit) {
 			IrcQuitMessage* msg = static_cast<IrcQuitMessage*>(message);

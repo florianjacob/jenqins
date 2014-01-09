@@ -21,8 +21,8 @@
 #define BOTMODULE_H
 #include <QObject>
 #include <QMetaObject>
-#include <Communi/IrcCore/IrcMessage>
-#include <Communi/IrcCore/IrcCommand>
+#include <IrcMessage>
+#include <IrcCommand>
 #include <QDebug>
 #include "../botconnection.h"
 

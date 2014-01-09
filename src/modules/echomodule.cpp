@@ -19,8 +19,6 @@
 
 #include "echomodule.h"
 
-#include <Communi/IrcCore/IrcSender>
-
 EchoModule::EchoModule(BotConnection* connection) : BotModule(connection)
 {
 	connect(connection, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
@@ -40,16 +38,15 @@ void EchoModule::onMessageReceived(IrcMessage* message)
 {
 	if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-		IrcSender sender(msg->prefix());
 		if (!msg->target().compare(connection->nickName(), Qt::CaseInsensitive)) {
 			// echo private message
-			connection->sendMessage(sender.name(), msg->message());
-			qDebug() << "Echoed private <" << sender.name() <<  ">" << msg->message() << ".";
-		} else if (msg->message().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
+			connection->sendMessage(msg->nick(), msg->content());
+			qDebug() << "Echoed private <" << msg->nick() <<  ">" << msg->content() << ".";
+		} else if (msg->content().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
 			// echo prefixed channel message
-			QString reply = msg->message().mid(msg->message().indexOf(" "));
-			connection->sendMessage(msg->target(), sender.name() + ":" + reply);
-			qDebug() << "Echoed public <" << sender.name() <<  ">" << msg->message() << ".";
+			QString reply = msg->content().mid(msg->content().indexOf(" "));
+			connection->sendMessage(msg->target(), msg->nick() + ":" + reply);
+			qDebug() << "Echoed public <" << msg->nick() <<  ">" << msg->content() << ".";
 		}
 	}
 

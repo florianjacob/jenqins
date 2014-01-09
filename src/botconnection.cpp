@@ -8,10 +8,9 @@
  */
 
 #include "botconnection.h"
-#include <Communi/IrcCore/IrcConnection>
-#include <Communi/IrcCore/IrcCommand>
-#include <Communi/IrcCore/IrcMessage>
-#include <Communi/IrcCore/IrcSender>
+#include <IrcConnection>
+#include <IrcCommand>
+#include <IrcMessage>
 #include <QtCore/QTimer>
 #include <QDebug>
 #include "modules/botmodule.h"
@@ -92,11 +91,11 @@ void BotConnection::onMessageReceived(IrcMessage* message)
 {
 	if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-		qDebug() << "[PM] <" << IrcSender(msg->prefix()).name() << ">" << msg->message();
+		qDebug() << "[PM] <" << message->nick() << ">" << msg->content();
 	} else if (message->type() == IrcMessage::Notice) {
 		IrcNoticeMessage* msg = static_cast<IrcNoticeMessage*>(message);
-		qDebug() << "[Notice]" << msg->message();
-		if (msg->message().startsWith("You are now identified for ")) {
+		qDebug() << "[Notice]" << msg->content();
+		if (msg->content().startsWith("You are now identified for ")) {
 			foreach (QString channel, m_channels)
 			{
 				sendCommand(IrcCommand::createJoin(channel));

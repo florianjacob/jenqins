@@ -21,7 +21,6 @@
 #include <QTime>
 #include <QFile>
 #include <QDataStream>
-#include <IrcSender>
 
 MemoModule::MemoModule(BotConnection* connection): BotModule(connection)
 {
@@ -52,23 +51,22 @@ void MemoModule::onMessageReceived(IrcMessage* message)
 {
 	if (message->type() == IrcMessage::Private) {
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
-		IrcSender sender(msg->prefix());
 
 		// is the message not a direct message => a message from a channel?
 		if (msg->target().compare(connection->nickName(), Qt::CaseInsensitive) != 0) {
-			if (memos.contains(sender.name())) {
-				qDebug() << "Replaying memos for" << sender.name() << "in" << msg->target() << "...";
-				foreach (const QString& message, memos.values(sender.name()))
+			if (memos.contains(msg->nick())) {
+				qDebug() << "Replaying memos for" << msg->nick() << "in" << msg->target() << "...";
+				foreach (const QString& message, memos.values(msg->nick()))
 				{
 					connection->sendMessage(msg->target(), message);
 					qDebug() << message;
 				}
 				qDebug() << "done.";
-				memos.remove(sender.name());
+				memos.remove(msg->nick());
 			}
 
-			if (msg->message().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
-				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
+			if (msg->content().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
+				QStringList parts = msg->content().split(" ", QString::SkipEmptyParts);
 				if (parts.size() >= 4) {
 					parts.removeFirst();
 
@@ -78,18 +76,18 @@ void MemoModule::onMessageReceived(IrcMessage* message)
 						parts.removeFirst();
 						if (receiver == connection->nickName()) {
 							connection->sendMessage(msg->target(),
-											sender.name() + QString(": You can't leave memos for me.."));
-						} else if (receiver == sender.name()) {
+											msg->nick() + QString(": You can't leave memos for me.."));
+						} else if (receiver == msg->nick()) {
 							connection->sendMessage(msg->target(),
-											sender.name() + QString(": You can't leave memos for yourself."));
+											msg->nick() + QString(": You can't leave memos for yourself."));
 						} else if (receiver.contains(":")) {
-							connection->sendMessage(msg->target(), sender.name() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?"));
+							connection->sendMessage(msg->target(), msg->nick() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?"));
 						} else {
 							QString memo = QString("%1: [%2] <%3/%4> %5")
 												.arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
-												.arg(msg->target()).arg(sender.name()).arg(parts.join(" "));
+												.arg(msg->target()).arg(msg->nick()).arg(parts.join(" "));
 							memos.insertMulti(receiver, memo);
-							connection->sendMessage(msg->target(), QString("%1: Memo for %2 recorded.").arg(sender.name()).arg(receiver));
+							connection->sendMessage(msg->target(), QString("%1: Memo for %2 recorded.").arg(msg->nick()).arg(receiver));
 							connection->sendCommand(IrcCommand::createNames(connection->channels()));
 							qDebug() << "Recorded memo for" << receiver << ":" << memo;
 						}
@@ -101,7 +99,7 @@ void MemoModule::onMessageReceived(IrcMessage* message)
 	} else if (message->type() == IrcMessage::Join) {
 		// we get join memos from all users in the channel at startup, so this gets also called
 		// for every user in the channel we joined
-		notifyAboutMemos(IrcSender(message->prefix()).name());
+		notifyAboutMemos(message->nick());
 	} else if (message->type() == IrcMessage::Nick) {
 		IrcNickMessage* msg = static_cast<IrcNickMessage*>(message);
 		notifyAboutMemos(msg->nick());

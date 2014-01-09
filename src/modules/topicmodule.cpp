@@ -37,9 +37,9 @@ void TopicModule::onMessageReceived(IrcMessage* message)
 
 		if (msg->target().compare(connection->nickName(), Qt::CaseInsensitive) != 0) {
 			// message is from channel
-			if (msg->message().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
+			if (msg->content().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
 				// message is for bot
-				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
+				QStringList parts = msg->content().split(" ", QString::SkipEmptyParts);
 				if (parts.size() >= 3) {
 					parts.removeFirst();
 

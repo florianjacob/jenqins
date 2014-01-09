@@ -10,8 +10,8 @@
 #ifndef BOTCONNECTION_H
 #define BOTCONNECTION_H
 
-#include <Communi/IrcCore/IrcConnection>
-#include <Communi/IrcCore/IrcMessage>
+#include <IrcConnection>
+#include <IrcMessage>
 #include <QTextStream>
 #include <QStringList>
 

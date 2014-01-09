@@ -40,9 +40,9 @@ void HelpModule::onMessageReceived(IrcMessage* message)
 		IrcPrivateMessage* msg = static_cast<IrcPrivateMessage*>(message);
 		if (msg->target().compare(connection->nickName(), Qt::CaseInsensitive) != 0) {
 			// message is from channel
-			if (msg->message().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
+			if (msg->content().startsWith(connection->nickName(), Qt::CaseInsensitive)) {
 				// message is for bot
-				QStringList parts = msg->message().split(" ", QString::SkipEmptyParts);
+				QStringList parts = msg->content().split(" ", QString::SkipEmptyParts);
 				if (parts.size() >= 2 && parts[1] == "help") {
 					connection->sendMessage(msg->target(), QString("I can provide you with the following services:"));
 					foreach (BotModule* module, connection->modules())
