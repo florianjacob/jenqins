@@ -15,6 +15,8 @@
 #include <iostream>
 #include <QTime>
 #include <QDebug>
+#include <QFileInfo>
+#include <QDir>
 
 #include "modules/echomodule.h"
 
@@ -39,7 +41,15 @@ int main(int argc, char* argv[])
 	BotConnection connection;
 	QTextStream qout(stdout);
 
-    QSettings settings("settings.ini", QSettings::IniFormat);
+	QFileInfo defaultConfig(QDir::homePath() + "/.config/jenqins.ini");
+	QFileInfo localConfig("settings.ini");
+	QString settingsPath;
+	if (localConfig.exists()) {
+		settingsPath = localConfig.absoluteFilePath();
+	} else {
+		settingsPath = defaultConfig.absoluteFilePath();
+	}
+    QSettings settings(settingsPath, QSettings::IniFormat);
     connection.setHost(settings.value("host", "irc.freenode.net").toString());
     connection.setPort(settings.value("port", 7070).toInt());
 	if (settings.value("ssl", "true").toBool()) {
