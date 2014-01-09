@@ -1,0 +1,8 @@
+== jenqins ==
+Needs Qt5 and libcommuni built against Qt5.
+
+jenqins.service can be used as systemd service unit in $HOME/.config/systemd/user/*.
+
+	systemctl --user start jenqins
+
+	systemctl --user enable jenqins

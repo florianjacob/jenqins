@@ -1,0 +1,6 @@
+[Unit]
+Description=jenqins
+After=network.target
+
+[Service]
+ExecStart=/home/username/jenqins/build/jenqins
