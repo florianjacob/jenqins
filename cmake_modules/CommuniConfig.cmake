@@ -1,7 +1,7 @@
-find_package(Qt4)
-include( ${QT_USE_FILE} )
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Network REQUIRED)
 
-FIND_LIBRARY(IRC_LIBRARY NAMES IrcCore PATHS ${QT_LIBRARY_DIR})
+FIND_LIBRARY(IRC_LIBRARY NAMES IrcCore)
 FIND_PATH(IRC_INCLUDE_DIR NAMES "ircglobal.h" PATH_SUFFIXES IrcCore Communi/IrcCore)
 
 # message( STATUS ${IRC_LIBRARY})
