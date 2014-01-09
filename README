@@ -1,8 +1,13 @@
 == jenqins ==
-Needs Qt5 and libcommuni built against Qt5.
+Requires Qt5, and libcommuni built against Qt5.
 
+=== systemd ===
 jenqins.service can be used as systemd service unit in $HOME/.config/systemd/user/*.
 
-	systemctl --user start jenqins
+edit the jenqins.service to have the correct path to the binary
 
-	systemctl --user enable jenqins
+	# equivalent of the usual systemctl enable
+	ln -s ~/jenqins/jenqins.service ~/.config/systemd/user/jenqins.service
+	systemctl --user start jenqins
+	# start user services at boot
+	sudo loginctl enable-linger <username>
