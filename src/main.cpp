@@ -38,18 +38,25 @@ int main(int argc, char* argv[])
 {
 	CleanExit cleanExit;
     QCoreApplication app(argc, argv);
-	BotConnection connection;
+
+	QString defaultConfigPath(QDir::homePath() + "/.config");
+	QString localPath(QDir::currentPath());
+	QFileInfo defaultConfig(defaultConfigPath + "/jenqins.ini");
+	QFileInfo localConfig(localPath + "/jenqins.ini");
+	QString configPath;
+	QString dataPath;
+	if (localConfig.exists()) {
+		configPath = localPath;
+		dataPath = localPath;
+	} else {
+		configPath = defaultConfigPath;
+		dataPath = QDir::homePath() + "/.local/share";
+	}
+
+	BotConnection connection(nullptr, dataPath);
 	QTextStream qout(stdout);
 
-	QFileInfo defaultConfig(QDir::homePath() + "/.config/jenqins.ini");
-	QFileInfo localConfig("settings.ini");
-	QString settingsPath;
-	if (localConfig.exists()) {
-		settingsPath = localConfig.absoluteFilePath();
-	} else {
-		settingsPath = defaultConfig.absoluteFilePath();
-	}
-    QSettings settings(settingsPath, QSettings::IniFormat);
+    QSettings settings(configPath, QSettings::IniFormat);
     connection.setHost(settings.value("host", "irc.freenode.net").toString());
     connection.setPort(settings.value("port", 7070).toInt());
 	if (settings.value("ssl", "true").toBool()) {

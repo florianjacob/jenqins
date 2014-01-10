@@ -16,7 +16,7 @@
 #include "modules/botmodule.h"
 
 
-BotConnection::BotConnection(QObject* parent) : IrcConnection(parent), out(stdout)
+BotConnection::BotConnection(QObject* parent, const QString& dataPath) : IrcConnection(parent), out(stdout), m_dataPath(dataPath)
 {
     connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(this, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
@@ -119,5 +119,9 @@ void BotConnection::sendAction(const QString& target, const QString& message)
 	sendCommand(IrcCommand::createCtcpAction(target, message));
 }
 
+QString BotConnection::dataPath() const
+{
+	return m_dataPath;
+}
 
 #include "botconnection.moc"

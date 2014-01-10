@@ -24,7 +24,8 @@
 
 MemoModule::MemoModule(BotConnection* connection): BotModule(connection)
 {
-	QFile file("memos.dat");
+	memoFilePath = connection->dataPath() + "/jenqins_memos.dat";
+	QFile file(memoFilePath);
 	if (file.exists()) {
 		file.open(QIODevice::ReadOnly);
 		QDataStream dataIn(&file);    // read the data serialized from the file
@@ -39,7 +40,7 @@ MemoModule::MemoModule(BotConnection* connection): BotModule(connection)
 
 MemoModule::~MemoModule()
 {
-	QFile file("memos.dat");
+	QFile file(memoFilePath);
 	file.open(QIODevice::WriteOnly);
 	QDataStream dataOut(&file);   // we will serialize the data into the file
 	dataOut << memos;
