@@ -84,13 +84,23 @@ void MemoModule::onMessageReceived(IrcMessage* message)
 						} else if (receiver.contains(":")) {
 							connection->sendMessage(msg->target(), msg->nick() + QString(": I'm afraid that colons aren't allowed in names. Do you mean somebody else?"));
 						} else {
-							QString memo = QString("%1: [%2] <%3/%4> %5")
-												.arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
-												.arg(msg->target()).arg(msg->nick()).arg(parts.join(" "));
-							memos.insertMulti(receiver, memo);
-							connection->sendMessage(msg->target(), QString("%1: Memo for %2 recorded.").arg(msg->nick()).arg(receiver));
-							connection->sendCommand(IrcCommand::createNames(connection->channels()));
-							qDebug() << "Recorded memo for" << receiver << ":" << memo;
+							// limit hash size, only allow for 512 messages stored
+							if (memos.size() < 512) {
+								// maximum length of one entry: 512 characters
+								QString memo = QString("%1: [%2] <%3/%4> %5")
+													.arg(receiver).arg(QTime::currentTime().toString("HH:mm"))
+													.arg(msg->target()).arg(msg->nick()).arg(parts.join(" ").left(512));
+								memos.insertMulti(receiver, memo);
+								connection->sendMessage(msg->target(),
+										QString("%1: Memo for %2 recorded.").arg(msg->nick()).arg(receiver));
+								connection->sendCommand(IrcCommand::createNames(connection->channels()));
+								qDebug() << "Recorded memo for" << receiver << ":" << memo;
+							} else {
+								connection->sendMessage(msg->target(),
+										QString("%1: I can't record a memo for %2 due to my limited memory.")
+										.arg(msg->nick()).arg(receiver));
+								qDebug() << "Memo storage full! Couldn't record memo for" << receiver;
+							}
 						}
 					}
 				}
