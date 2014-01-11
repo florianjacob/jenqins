@@ -39,20 +39,17 @@ int main(int argc, char* argv[])
 	CleanExit cleanExit;
     QCoreApplication app(argc, argv);
 
-	QString defaultConfigPath(QDir::homePath() + "/.config");
-	QString localPath(QDir::currentPath());
-	QFileInfo defaultConfig(defaultConfigPath + "/jenqins.ini");
-	QFileInfo localConfig(localPath + "/jenqins.ini");
+	QFileInfo localConfig(QDir::currentPath() + "/jenqins.ini");
 	QString configPath;
 	QString dataPath;
 	if (localConfig.exists()) {
 		qDebug() << localConfig.path() << "exists, using local folder.";
-		configPath = localPath;
-		dataPath = localPath;
+		configPath = localConfig.path();
+		dataPath = localConfig.path();
 	} else {
-		configPath = defaultConfigPath;
+		configPath = QDir::homePath() + "/.config/jenqins.ini";
 		dataPath = QDir::homePath() + "/.local/share";
-		qDebug() << "using" << configPath << "and" << "dataPath";
+		qDebug() << "using" << configPath << "and" << dataPath;
 	}
 
 	BotConnection connection(nullptr, dataPath);
