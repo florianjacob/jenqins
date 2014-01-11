@@ -46,11 +46,13 @@ int main(int argc, char* argv[])
 	QString configPath;
 	QString dataPath;
 	if (localConfig.exists()) {
+		qDebug() << localConfig.path() << "exists, using local folder.";
 		configPath = localPath;
 		dataPath = localPath;
 	} else {
 		configPath = defaultConfigPath;
 		dataPath = QDir::homePath() + "/.local/share";
+		qDebug() << "using" << configPath << "and" << "dataPath";
 	}
 
 	BotConnection connection(nullptr, dataPath);
