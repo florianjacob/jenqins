@@ -14,23 +14,24 @@
 #include <IrcMessage>
 #include <QTextStream>
 #include <QStringList>
+#include <QAbstractSocket>
 
 class BotModule;
 
 class BotConnection : public IrcConnection
 {
-    Q_OBJECT
-    Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
-    Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
+	Q_OBJECT
+	Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
+	Q_PROPERTY(QString nickservPassword READ nickservPassword WRITE setNickservPassword)
 	Q_PROPERTY(QList<BotModule*> modules READ modules)
-    Q_PROPERTY(QString dataPath READ dataPath)
+	Q_PROPERTY(QString dataPath READ dataPath)
 	Q_DISABLE_COPY(BotConnection)
 
 public:
-    explicit BotConnection(QObject* parent = 0, const QString& dataPath = "");
+	explicit BotConnection(QObject* parent = 0, const QString& dataPath = "");
 
-    QStringList channels() const;
-    void setChannels(const QStringList& channel);
+	QStringList channels() const;
+	void setChannels(const QStringList& channel);
 
 	QString nickservPassword() const;
 	void setNickservPassword(const QString& password);
@@ -43,14 +44,16 @@ public:
 	QString dataPath() const;
 
 private slots:
-    void onConnected();
+	void onConnected();
 	void onDisconnected();
+	void onSocketError(QAbstractSocket::SocketError error);
+	void onSocketStateChanged(QAbstractSocket::SocketState socketState);
 	void onMessageReceived(IrcMessage* message);
 
 private:
-    QStringList m_channels;
-    QString m_nickservPassword;
-    QTextStream out;
+	QStringList m_channels;
+	QString m_nickservPassword;
+	QTextStream out;
 	QList<BotModule*> m_modules;
 	QString m_dataPath;
 

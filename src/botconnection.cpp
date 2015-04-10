@@ -18,10 +18,15 @@
 
 BotConnection::BotConnection(QObject* parent, const QString& dataPath) : IrcConnection(parent), out(stdout), m_dataPath(dataPath)
 {
-    connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
-    connect(this, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+	connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
+	connect(this, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+	connect(this, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
+	connect(this, SIGNAL(socketStateChanged(QAbstractSocket::SocketState)), this, SLOT(onSocketStateChanged(QAbstractSocket::SocketState)));
 
 	connect(this, SIGNAL(messageReceived(IrcMessage*)), this, SLOT(onMessageReceived(IrcMessage*)));
+
+	// automatic reconnect after 10 seconds (hopefully)
+	setReconnectDelay(10);
 
 }
 
@@ -77,6 +82,16 @@ void BotConnection::onConnected()
 		}
 	}
 
+}
+
+void BotConnection::onSocketStateChanged(QAbstractSocket::SocketState socketState)
+{
+	out << "SocketState changed: " << socketState << endl;
+}
+
+void BotConnection::onSocketError(QAbstractSocket::SocketError error)
+{
+	out << "Socket Error: " << error << endl;
 }
 
 void BotConnection::onDisconnected()
